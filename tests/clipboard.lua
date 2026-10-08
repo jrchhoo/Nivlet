@@ -1,10 +1,10 @@
 package.path="Toolkit/?.lua;"..package.path
 local now,count,text,types,bundle,saved=1000,0,"before",{},"org.test.editor",nil
 local reads,starts,stops=0,0,0
-hs={settings={get=function() return saved end,set=function(_,v) saved=v end},
+hs={settings={clear=function() end,get=function() return saved end,set=function(_,v) saved=v end},
  timer={secondsSinceEpoch=function() return now end,doEvery=function(_,fn) starts=starts+1;return {stop=function() stops=stops+1 end} end},
  application={frontmostApplication=function() return {bundleID=function() return bundle end} end},
- pasteboard={changeCount=function() return count end,contentTypes=function() return types end,
+ pasteboard={readImage=function() return nil end,changeCount=function() return count end,contentTypes=function() return types end,
  getContents=function() reads=reads+1;return text end,setContents=function(v) text=v;count=count+1;return true end}}
 local m=require('modules.clipboard');m.start();assert(starts==0 and reads==0)
 local config=m.defaults();config.enabled=true;config.limit=10;config.minutes=1;config.excluded={'org.test.passwords'}
