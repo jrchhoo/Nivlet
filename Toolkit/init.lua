@@ -7,6 +7,8 @@ local preferences = require("modules.preferences")
 local windows = require("modules.windows")
 local input = require("modules.input_method")
 input.start()
+local clipboard = require("modules.clipboard")
+clipboard.start()
 local app = {bindings={}}
 _G.desktopToolkit = app
 local key = "desktoptoolkit.preferences.v1"
@@ -45,17 +47,27 @@ end
 local ok, message = install(app.config)
 if not ok then hs.alert.show(message) end
 local function reply(ok, message)
-    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,config=app.config,input=input.config,sources=input.sources(),accessibility=hs.accessibilityState()}) .. ")") end
+    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,config=app.config,input=input.config,sources=input.sources(),clipboard=clipboard.snapshot(),accessibility=hs.accessibilityState()}) .. ")") end
 end
-function app.openSettings()
-    if app.settings then app.settings:show():bringToFront(true); reply(true, ""); return end
+function app.openSettings(section)
+    section=type(section)=="string" and section or nil
+    app.settingsSection=section
+    if app.settings then app.settings:show():bringToFront(true); reply(true, ""); if section then app.settings:evaluateJavaScript("document.getElementById(" .. hs.json.encode({section}) .. "[0]).scrollIntoView()") end; return end
     app.controller = hs.webview.usercontent.new("toolkit")
     app.controller:setCallback(function(event)
         local body = event.body
         if type(body) ~= "table" then return end
-        if body.action == "load" then reply(true, "") end
+        if body.action == "load" then
+            reply(true, "")
+            if app.settingsSection then app.settings:evaluateJavaScript("document.getElementById(" .. hs.json.encode({app.settingsSection}) .. "[0]).scrollIntoView()") end
+        end
         if body.action == "save" then local success, result = app.save(body.config); reply(success, result) end
         if body.action == "saveInput" then local success, result = input.save(body.config); reply(success, result) end
+        if body.action == "saveClipboard" then local success, result = clipboard.save(body.config); reply(success, result) end
+        if body.action == "pauseClipboard" then local success, result = clipboard.pause(); reply(success, result) end
+        if body.action == "refreshClipboard" then reply(true, "") end
+        if body.action == "copyClipboard" then local success, result = clipboard.copy(body.id); reply(success, result) end
+        if body.action == "clearClipboard" then local success, result = clipboard.clear(); reply(success, result) end
         if body.action == "chooseApp" then
             local paths = hs.dialog.chooseFileOrFolder("选择要配置输入法的应用", "/Applications", true, false, false, {"app"}, true)
             local path = paths
@@ -75,6 +87,9 @@ function app.openSettings()
         :windowStyle({"titled","closable","resizable"}):windowTitle("DesktopToolkit 设置")
         :allowTextEntry(true):html(html):show():bringToFront(true)
 end
+clipboard.startMenu(function() app.openSettings("clipSection") end)
+local system = require("modules.sys_info")
+system.start()
 app.menu = hs.menubar.new():setTitle("DT"):setTooltip("DesktopToolkit")
 app.menu:setMenu({{title="设置…",fn=app.openSettings},{title="退出 DesktopToolkit",fn=function() os.exit() end}})
 print("DesktopToolkit ready", hs.configdir, hs.settings.bundleID, "bindings", #app.bindings)

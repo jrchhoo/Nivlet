@@ -10,6 +10,7 @@ test -d "$app_path"
 /usr/libexec/PlistBuddy -c Print:CFBundleIdentifier "$app_path/Contents/Info.plist" | /usr/bin/grep -qx dev.local.DesktopToolkit
 mkdir -p "$app_path/Contents/Resources/Toolkit"
 cp -R "$project_dir/Toolkit/." "$app_path/Contents/Resources/Toolkit/"
+xcrun clang -fobjc-arc -Wall -Wextra -Werror -arch arm64 -arch x86_64 -mmacosx-version-min=13.0 -framework Foundation "$project_dir/Native/system_probe.m" -o "$app_path/Contents/Resources/Toolkit/system-probe"
 # Ad-hoc signing is only for this local probe, not a distribution signature.
 codesign --force --deep --sign - "$app_path"
 codesign --verify --deep --strict "$app_path"

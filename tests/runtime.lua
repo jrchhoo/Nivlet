@@ -9,6 +9,7 @@ hs = {
     hotkey={assignable=function(_,k) return k ~= "9" end,systemAssigned=function() return false end,
         bind=function(_,k,fn) callbacks[k]=fn; return {delete=function() callbacks[k]=nil end} end},
 }
+package.loaded["modules.sys_info"]={start=function() end}
 dofile("Toolkit/init.lua")
 assert(#desktopToolkit.bindings==0)
 local old={enabled=true,shortcuts={left={key="1",mods={"ctrl","alt","cmd","shift"}}}}
