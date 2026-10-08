@@ -5,6 +5,8 @@ local root = hs.processInfo.bundlePath .. "/Contents/Resources/Toolkit/"
 package.path = root .. "?.lua;" .. package.path
 local preferences = require("modules.preferences")
 local windows = require("modules.windows")
+local input = require("modules.input_method")
+input.start()
 local app = {bindings={}}
 _G.desktopToolkit = app
 local key = "desktoptoolkit.preferences.v1"
@@ -43,16 +45,29 @@ end
 local ok, message = install(app.config)
 if not ok then hs.alert.show(message) end
 local function reply(ok, message)
-    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,config=app.config,accessibility=hs.accessibilityState()}) .. ")") end
+    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,config=app.config,input=input.config,sources=input.sources(),accessibility=hs.accessibilityState()}) .. ")") end
 end
 function app.openSettings()
-    if app.settings then app.settings:show():bringToFront(true); return end
+    if app.settings then app.settings:show():bringToFront(true); reply(true, ""); return end
     app.controller = hs.webview.usercontent.new("toolkit")
     app.controller:setCallback(function(event)
         local body = event.body
         if type(body) ~= "table" then return end
         if body.action == "load" then reply(true, "") end
         if body.action == "save" then local success, result = app.save(body.config); reply(success, result) end
+        if body.action == "saveInput" then local success, result = input.save(body.config); reply(success, result) end
+        if body.action == "chooseApp" then
+            local paths = hs.dialog.chooseFileOrFolder("选择要配置输入法的应用", "/Applications", true, false, false, {"app"}, true)
+            local path = paths
+            if type(paths)=="table" then path=paths[1] or paths["1"] end
+            if type(path)=="string" and path ~= "" then
+                local info = hs.application.infoForBundlePath(path)
+                if info and info.CFBundleIdentifier then
+                    local value = {bundleID=info.CFBundleIdentifier,name=info.CFBundleDisplayName or info.CFBundleName or info.CFBundleIdentifier}
+                    app.settings:evaluateJavaScript("window.addInputRule(" .. hs.json.encode(value) .. ")")
+                else reply(false, "无法识别所选应用") end
+            end
+        end
     end)
     local file = assert(io.open(root .. "settings.html", "r"))
     local html = file:read("*a"); file:close()

@@ -12,7 +12,9 @@
 - 窗口管理默认关闭，所有快捷键默认留空。
 - 重复组合、系统占用和绑定失败时显示错误；其他 App 冲突可能无法检测。
 
-剪贴板、输入法、应用启动等尚未加入。不会导入个人 Hammerspoon 配置。
+- 按应用自动切换输入法：通过应用选择器添加规则，从本机已启用输入法中选择；默认关闭。
+
+剪贴板、应用启动等尚未加入。不会导入个人 Hammerspoon 配置。
 
 ## 本地构建
 
@@ -23,8 +25,10 @@ git clone https://github.com/jrchhoo/DesktopToolkit.git
 cd DesktopToolkit
 sh scripts/fetch-runtime.sh
 lua tests/preferences.lua
+lua tests/runtime.lua
+lua tests/input_method.lua
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer sh scripts/build-dev.sh
-open -n build/DerivedData/Build/Products/Debug/DesktopToolkit.app
+open build/DerivedData/Build/Products/Debug/DesktopToolkit.app
 ```
 
 fetch-runtime.sh 下载固定 Hammerspoon 1.1.1 commit 并应用 patch；已有 vendor 目录时拒绝覆盖。build-dev.sh 不启动 App，不改变全局 xcode-select。产物使用本地 ad-hoc 签名；不等于 Developer ID 签名或公证。
@@ -37,6 +41,8 @@ fetch-runtime.sh 下载固定 Hammerspoon 1.1.1 commit 并应用 patch；已有 
 4. 聚焦普通应用窗口后按对应组合。恢复原位置仅针对本次运行中已调整的窗口。
 5. 留空按键可解除该操作的绑定；关闭模块并保存会解除所有绑定。
 
+输入法：在同一设置界面添加应用、选择输入法、勾选启用并保存。规则在应用下次激活时生效；未配置的应用保持当前输入法。仅使用系统已启用的输入法，不安装或删除输入法。关闭功能后停止监听，不自动恢复前一个输入法。此功能无需辅助功能权限。
+
 不要照搬个人 Hammerspoon 已使用的快捷键。无默认睡眠快捷键，无浏览器路由，无滚轮监听，无剪贴板记录。
 
 ## 隔离与数据
@@ -46,7 +52,7 @@ fetch-runtime.sh 下载固定 Hammerspoon 1.1.1 commit 并应用 patch；已有 
 - 设置保存在该 App 独立 preferences domain，bootstrap 只加载 App 内置资源。
 - 不读取 `~/.hammerspoon`，不自动 reload 个人配置，不更改默认浏览器。
 - 无应用代码主动请求公网接口，移除了上游 URL handlers、Services 和更新源，关闭上游 crash reporting 初始化。
-- 退出 App 会解除快捷键。移除 App 后，可在系统设置撤销其辅助功能权限；偏好和 bootstrap 保留，方便重新安装。
+- App 使用单实例保护；重复启动会激活已有实例。退出 App 会解除快捷键。移除 App 后，可在系统设置撤销其辅助功能权限；偏好和 bootstrap 保留，方便重新安装。
 
 ## 验证与限制
 
@@ -69,3 +75,10 @@ DesktopToolkit 授权，不更改原 Hammerspoon 的条目。正式发布需要�
 已在开发版自己的普通窗口验证左/右半屏、最大化和恢复原位置，设置保存后的绑定注册与关闭后的删除也已验证。实体键盘回调已在基础 Runtime 阶段通过；尚未对所有第三方 App 做端到端验证。
 
 具体证据与边界见 [VALIDATION.md](VALIDATION.md)。
+
+### 独立安装开发版
+构建后可将 `build/DerivedData/Build/Products/Debug/DesktopToolkit.app` 复制到
+`~/Applications`，从该位置打开。首次授权针对该安装版。
+本轮已实测独立安装、CotEditor 四项实体键盘操作、重启恢复设置与绑定、
+全屏保护和单项解除。单实例问题已修复，修复安装版待再次辅助功能授权复测。
+多显示器、发布签名、公证与下载后 Gatekeeper 流程尚未验证。

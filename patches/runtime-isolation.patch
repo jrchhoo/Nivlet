@@ -122,10 +122,10 @@ index 2e2764f..98f5534 100644
  </dict>
  </plist>
 diff --git a/Hammerspoon/MJAppDelegate.m b/Hammerspoon/MJAppDelegate.m
-index 1f0d2fb..11a7a62 100644
+index 1f0d2fb..a05174d 100644
 --- a/Hammerspoon/MJAppDelegate.m
 +++ b/Hammerspoon/MJAppDelegate.m
-@@ -214,8 +214,22 @@
+@@ -214,8 +214,30 @@
          [self showConsoleWindow:nil];
      } else {
          // No test environment detected, this is a live user run
@@ -134,6 +134,14 @@ index 1f0d2fb..11a7a62 100644
 +        // DesktopToolkit owns its bootstrap and never loads personal Hammerspoon config.
 +        NSBundle *bundle = [NSBundle mainBundle];
 +        if (![bundle.bundleIdentifier isEqualToString:@"dev.local.DesktopToolkit"]) abort();
++        // Do not allow competing instances to register the same global shortcuts.
++        for (NSRunningApplication *running in [NSRunningApplication runningApplicationsWithBundleIdentifier:bundle.bundleIdentifier]) {
++            if (running.processIdentifier != NSProcessInfo.processInfo.processIdentifier && !running.terminated) {
++                [running activateWithOptions:NSApplicationActivateIgnoringOtherApps];
++                [NSApp terminate:nil];
++                return;
++            }
++        }
 +        NSString *support = [NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES) firstObject];
 +        NSString *directory = [support stringByAppendingPathComponent:bundle.bundleIdentifier];
 +        NSError *bootstrapError = nil;
@@ -150,7 +158,7 @@ index 1f0d2fb..11a7a62 100644
  
          // Ensure we have a Spoons directory
          NSString *spoonsPath = [MJConfigDirAbsolute() stringByAppendingPathComponent:@"Spoons"];
-@@ -246,7 +260,7 @@
+@@ -246,7 +268,7 @@
  
      // Enable Sentry, if we have an API URL available
  #ifdef SENTRY_API_URL
@@ -159,7 +167,7 @@ index 1f0d2fb..11a7a62 100644
          SentryEvent* (^sentryWillUploadCrashReport) (SentryEvent *event) = ^SentryEvent* (SentryEvent *event) {
              if ([event.extra objectForKey:@"MjolnirModuleLoaded"]) {
                  dispatch_async(dispatch_get_main_queue(), ^{
-@@ -267,7 +281,7 @@
+@@ -267,7 +289,7 @@
  #endif
  
      // Become the Sparkle delegate, if it's available
@@ -168,7 +176,7 @@ index 1f0d2fb..11a7a62 100644
          NSString *frameworkPath = [[[NSBundle mainBundle] privateFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
          if ([[NSBundle bundleWithPath:frameworkPath] load]) {
  #pragma clang diagnostic push
-@@ -326,7 +340,7 @@
+@@ -326,7 +348,7 @@
                           MJShowDockIconKey: @NO,
                           MJShowMenuIconKey: @YES,
                           HSAutoLoadExtensions: @YES,
