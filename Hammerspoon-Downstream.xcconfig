@@ -1,0 +1,2 @@
+PRODUCT_NAME = DesktopToolkit
+PRODUCT_BUNDLE_IDENTIFIER = dev.local.DesktopToolkit

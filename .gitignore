@@ -1,0 +1,6 @@
+.DS_Store
+/build/
+/vendor/
+/RUNTIME-VALIDATION.md
+*.xcuserstate
+xcuserdata/

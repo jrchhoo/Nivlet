@@ -1,0 +1,12 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><style>
+body{font:15px -apple-system,sans-serif;margin:32px;color:#20252c;background:#f6f7f9}h1{font-size:25px}section{background:white;padding:22px;border-radius:14px;margin:18px 0}p{color:#59636e;line-height:1.5}table{width:100%;border-collapse:collapse}td{padding:12px 4px;border-bottom:1px solid #eee}input[type=text]{width:42px;padding:7px;text-align:center}label{margin-right:10px}button{padding:10px 24px;border:0;border-radius:8px;background:#1768da;color:white;font:inherit}#status{min-height:24px}small{color:#59636e}</style>
+<h1>DesktopToolkit</h1><p>窗口管理与快捷键</p><section><label><input id="enabled" type="checkbox">启用窗口管理</label><p>默认关闭。快捷键由你配置，留空表示不绑定。</p><div id="permission"></div><table id="rows"></table></section><button id="save">保存设置</button><p id="status" role="status"></p><small>当前为开发预览版。其他 App 的快捷键冲突可能无法检测；请避开已有组合。</small>
+<script>
+const actions={left:'左半屏',right:'右半屏',maximize:'最大化',restore:'恢复原位置'};
+const mods={ctrl:'⌃',alt:'⌥',cmd:'⌘',shift:'⇧'};
+for(const [id,label] of Object.entries(actions)){const row=document.createElement('tr');row.innerHTML='<td>'+label+'</td><td>'+Object.entries(mods).map(([m,t])=>'<label><input type="checkbox" id="'+id+'-'+m+'">'+t+'</label>').join('')+'</td><td><input aria-label="'+label+'按键" id="'+id+'-key" type="text" maxlength="1"></td>';document.querySelector('#rows').append(row)}
+window.receive=function(data){document.querySelector('#enabled').checked=data.config.enabled;for(const id of Object.keys(actions)){const item=data.config.shortcuts[id]||{key:'',mods:[]};document.getElementById(id+'-key').value=item.key;for(const m of Object.keys(mods))document.getElementById(id+'-'+m).checked=item.mods.includes(m)}document.querySelector('#permission').textContent=data.accessibility?'辅助功能权限已开启':'请在系统设置 → 隐私与安全性 → 辅助功能中允许 DesktopToolkit';document.querySelector('#status').textContent=data.message;document.querySelector('#status').style.color=data.ok?'#28653d':'#b3261e'};
+function send(body){window.webkit.messageHandlers.toolkit.postMessage(body)}
+document.querySelector('#save').onclick=()=>{const shortcuts={};for(const id of Object.keys(actions))shortcuts[id]={key:document.getElementById(id+'-key').value,mods:Object.keys(mods).filter(m=>document.getElementById(id+'-'+m).checked)};send({action:'save',config:{enabled:document.querySelector('#enabled').checked,shortcuts}})};
+send({action:'load'});
+</script></html>

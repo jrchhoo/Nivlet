@@ -1,0 +1,179 @@
+diff --git a/Hammerspoon/Build Configs/Hammerspoon-Debug.xcconfig b/Hammerspoon/Build Configs/Hammerspoon-Debug.xcconfig
+index f5cc96c..dc33d2a 100644
+--- a/Hammerspoon/Build Configs/Hammerspoon-Debug.xcconfig	
++++ b/Hammerspoon/Build Configs/Hammerspoon-Debug.xcconfig	
+@@ -11,4 +11,4 @@
+ 
+ #include "../../Pods/Target Support Files/Pods-Hammerspoon/Pods-Hammerspoon.debug.xcconfig"
+ #include "Hammerspoon-Base.xcconfig"
+-#include? "../../../Hammerspoon-Downstream.xcconfig"
++#include? "../../Hammerspoon-Downstream.xcconfig"
+diff --git a/Hammerspoon/Hammerspoon-Info.plist b/Hammerspoon/Hammerspoon-Info.plist
+index 2e2764f..98f5534 100644
+--- a/Hammerspoon/Hammerspoon-Info.plist
++++ b/Hammerspoon/Hammerspoon-Info.plist
+@@ -152,45 +152,6 @@
+ 	<string>$(MARKETING_VERSION)</string>
+ 	<key>CFBundleSignature</key>
+ 	<string>????</string>
+-	<key>CFBundleURLTypes</key>
+-	<array>
+-		<dict>
+-			<key>CFBundleTypeRole</key>
+-			<string>Editor</string>
+-			<key>CFBundleURLIconFile</key>
+-			<string></string>
+-			<key>CFBundleURLName</key>
+-			<string>org.hammerspoon.Hammerspoon</string>
+-			<key>CFBundleURLSchemes</key>
+-			<array>
+-				<string>hammerspoon</string>
+-			</array>
+-		</dict>
+-		<dict>
+-			<key>CFBundleURLName</key>
+-			<string>hammerspoon.Hammerspoon.http</string>
+-			<key>CFBundleURLSchemes</key>
+-			<array>
+-				<string>http</string>
+-			</array>
+-		</dict>
+-		<dict>
+-			<key>CFBundleURLName</key>
+-			<string>hammerspoon.Hammerspoon.https</string>
+-			<key>CFBundleURLSchemes</key>
+-			<array>
+-				<string>https</string>
+-			</array>
+-		</dict>
+-		<dict>
+-			<key>CFBundleURLName</key>
+-			<string>org.hammerspoon.Hammerspoon.mailto</string>
+-			<key>CFBundleURLSchemes</key>
+-			<array>
+-				<string>mailto</string>
+-			</array>
+-		</dict>
+-	</array>
+ 	<key>CFBundleVersion</key>
+ 	<string>$(CURRENT_PROJECT_VERSION)</string>
+ 	<key>INIntentsSupported</key>
+@@ -226,39 +187,6 @@
+ 	<string>Some Hammerspoon extensions (such as hs.noises) require access to the microphone.</string>
+ 	<key>NSPrincipalClass</key>
+ 	<string>SentryCrashExceptionApplication</string>
+-	<key>NSServices</key>
+-	<array>
+-		<dict>
+-			<key>NSMenuItem</key>
+-			<dict>
+-				<key>default</key>
+-				<string>Send to Hammerspoon</string>
+-			</dict>
+-			<key>NSMessage</key>
+-			<string>processDockIconDraggedText</string>
+-			<key>NSRequiredContext</key>
+-			<dict/>
+-			<key>NSSendTypes</key>
+-			<array>
+-				<string>NSStringPboardType</string>
+-			</array>
+-		</dict>
+-		<dict>
+-			<key>NSMenuItem</key>
+-			<dict>
+-				<key>default</key>
+-				<string>Send to Hammerspoon</string>
+-			</dict>
+-			<key>NSMessage</key>
+-			<string>processDockIconDraggedFile</string>
+-			<key>NSRequiredContext</key>
+-			<dict/>
+-			<key>NSSendFileTypes</key>
+-			<array>
+-				<string>public.item</string>
+-			</array>
+-		</dict>
+-	</array>
+ 	<key>NSUserActivityTypes</key>
+ 	<array>
+ 		<string>HSExecuteLuaIntent</string>
+@@ -268,12 +196,6 @@
+ 	<string>alert</string>
+ 	<key>OSAScriptingDefinition</key>
+ 	<string>Hammerspoon.sdef</string>
+-	<key>SUEnableAutomaticChecks</key>
+-	<true/>
+-	<key>SUFeedURL</key>
+-	<string>https://raw.githubusercontent.com/Hammerspoon/hammerspoon/master/appcast.xml</string>
+-	<key>SUScheduledCheckInterval</key>
+-	<integer>21600</integer>
+ 	<key>UTExportedTypeDeclarations</key>
+ 	<array>
+ 		<dict>
+@@ -297,5 +219,9 @@
+ 			</dict>
+ 		</dict>
+ 	</array>
++	<key>CFBundleDisplayName</key>
++	<string>DesktopToolkit Dev</string>
++	<key>SUEnableAutomaticChecks</key>
++	<false/>
+ </dict>
+ </plist>
+diff --git a/Hammerspoon/MJAppDelegate.m b/Hammerspoon/MJAppDelegate.m
+index 1f0d2fb..11a7a62 100644
+--- a/Hammerspoon/MJAppDelegate.m
++++ b/Hammerspoon/MJAppDelegate.m
+@@ -214,8 +214,22 @@
+         [self showConsoleWindow:nil];
+     } else {
+         // No test environment detected, this is a live user run
+-        NSString* userMJConfigFile = [[NSUserDefaults standardUserDefaults] stringForKey:@"MJConfigFile"];
+-        if (userMJConfigFile) MJConfigFile = userMJConfigFile ;
++        // DesktopToolkit owns its bootstrap and never loads personal Hammerspoon config.
++        NSBundle *bundle = [NSBundle mainBundle];
++        if (![bundle.bundleIdentifier isEqualToString:@"dev.local.DesktopToolkit"]) abort();
++        NSString *support = [NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES) firstObject];
++        NSString *directory = [support stringByAppendingPathComponent:bundle.bundleIdentifier];
++        NSError *bootstrapError = nil;
++        if (![[NSFileManager defaultManager] createDirectoryAtPath:directory withIntermediateDirectories:YES attributes:nil error:&bootstrapError]) {
++            NSLog(@"DesktopToolkit bootstrap directory failed: %@", bootstrapError);
++            abort();
++        }
++        MJConfigFile = [directory stringByAppendingPathComponent:@"init.lua"];
++        NSString *bootstrap = @"dofile(hs.processInfo.bundlePath .. \"/Contents/Resources/Toolkit/init.lua\")\n";
++        if (![bootstrap writeToFile:MJConfigFile atomically:YES encoding:NSUTF8StringEncoding error:&bootstrapError]) {
++            NSLog(@"DesktopToolkit bootstrap write failed: %@", bootstrapError);
++            abort();
++        }
+ 
+         // Ensure we have a Spoons directory
+         NSString *spoonsPath = [MJConfigDirAbsolute() stringByAppendingPathComponent:@"Spoons"];
+@@ -246,7 +260,7 @@
+ 
+     // Enable Sentry, if we have an API URL available
+ #ifdef SENTRY_API_URL
+-    if (HSUploadCrashData() && !isTesting) {
++    if (NO && HSUploadCrashData() && !isTesting) {
+         SentryEvent* (^sentryWillUploadCrashReport) (SentryEvent *event) = ^SentryEvent* (SentryEvent *event) {
+             if ([event.extra objectForKey:@"MjolnirModuleLoaded"]) {
+                 dispatch_async(dispatch_get_main_queue(), ^{
+@@ -267,7 +281,7 @@
+ #endif
+ 
+     // Become the Sparkle delegate, if it's available
+-    if (NSClassFromString(@"SUUpdater")) {
++    if (NO && NSClassFromString(@"SUUpdater")) {
+         NSString *frameworkPath = [[[NSBundle mainBundle] privateFrameworksPath] stringByAppendingPathComponent:@"Sparkle.framework"];
+         if ([[NSBundle bundleWithPath:frameworkPath] load]) {
+ #pragma clang diagnostic push
+@@ -326,7 +340,7 @@
+                          MJShowDockIconKey: @NO,
+                          MJShowMenuIconKey: @YES,
+                          HSAutoLoadExtensions: @YES,
+-                         HSUploadCrashDataKey: @YES,
++                         HSUploadCrashDataKey: @NO,
+                          HSAppleScriptEnabledKey: @NO,
+                          HSOpenConsoleOnDockClickKey: @YES,
+                          HSPreferencesDarkModeKey: @NO,

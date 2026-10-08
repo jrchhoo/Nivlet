@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+project_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+sh "$project_dir/scripts/preflight.sh"
+upstream_dir="$project_dir/vendor/hammerspoon"
+cd "$upstream_dir"
+xcodebuild -workspace Hammerspoon.xcworkspace -scheme Hammerspoon -configuration Debug -derivedDataPath "$project_dir/build/DerivedData" CODE_SIGNING_ALLOWED=NO CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER=NO build
+app_path="$project_dir/build/DerivedData/Build/Products/Debug/DesktopToolkit.app"
+test -d "$app_path"
+/usr/libexec/PlistBuddy -c Print:CFBundleIdentifier "$app_path/Contents/Info.plist" | /usr/bin/grep -qx dev.local.DesktopToolkit
+mkdir -p "$app_path/Contents/Resources/Toolkit"
+cp -R "$project_dir/Toolkit/." "$app_path/Contents/Resources/Toolkit/"
+# Ad-hoc signing is only for this local probe, not a distribution signature.
+codesign --force --deep --sign - "$app_path"
+codesign --verify --deep --strict "$app_path"
+echo "Local probe built: $app_path"
+echo "App has not been launched. Complete isolation review before running it."
