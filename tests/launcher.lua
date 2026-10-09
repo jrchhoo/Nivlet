@@ -31,3 +31,5 @@ assert(m.save(config('K','com.example.missing')));bindings['ctrl+cmd+K']();asser
 assert(not m.open('com.example.failed'))
 assert(m.save({enabled=false,rules={}}) and next(bindings)==nil)
 print('App launch dispatch, validation, conflicts, registration rollback, unbind, disable and restart restoration passed')
+
+local caseDuplicate=config('J');caseDuplicate.rules[2]={bundleID='COM.EXAMPLE.PROBE',shortcut={key='L',mods={'ctrl','cmd'}}};assert(not m.validate(caseDuplicate))

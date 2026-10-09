@@ -46,3 +46,27 @@ assert(manager.apply(doc({windows={enabled=false,shortcuts={left=key}},popupShor
 assert(state.windows.shortcuts.left.key=="left")
 local roundtrip=manager.export();assert(manager.apply(roundtrip));assert(state.windows.shortcuts.left.key=="left")
 print("Configuration defaults, strict schema, partial imports, target/permission/conflict checks, rollback and round-trip passed")
+
+state=clone(defaults)
+assert(manager.prepare(doc({windows={enabled=false,shortcuts={grid9={key="up",mods={"ctrl"}}}}})))
+state.launcher={enabled=false,rules={{bundleID="com.example.app",shortcut={key="up",mods={"ctrl"}}}}}
+assert(not manager.prepare(doc({windows={enabled=false,shortcuts={grid9={key="up",mods={"ctrl"}}}}})))
+assert(not manager.prepare(doc({windows={enabled=false,shortcuts={grid10={key="up",mods={"ctrl"}}}}})))
+print("Import accepts new window actions and detects cross-module conflicts and unknown layouts")
+
+state=clone(defaults);state.popupShortcut={key="K",mods={"ctrl"}}
+assert(manager.export().modules.popupShortcut.key=="K")
+assert(manager.export(true).modules.popupShortcut==false,"Default example leaked a saved popup shortcut")
+print("Default export preserves false instead of falling back to a saved personal shortcut")
+
+state=clone(defaults);state.clipboard.enabled=true;history=true
+local function retention(minutes) local config=clone(state.clipboard);config.minutes=minutes;return doc({clipboard=config}) end
+assert(manager.prepare(retention(0)), 'Finite to forever must not clear history')
+assert(manager.prepare(retention(1440)), 'Extending retention must preserve history')
+state.clipboard.minutes=0
+assert(not manager.prepare(retention(1440)), 'Forever to finite can expire history and needs explicit handling')
+assert(manager.prepare(retention(0)))
+history=false
+assert(manager.apply(retention(0)));assert(manager.export().modules.clipboard.minutes==0)
+assert(manager.apply(retention(1440)));assert(manager.export().modules.clipboard.minutes==1440)
+print('JSON retention protects history when leaving permanent mode and round-trips both modes')

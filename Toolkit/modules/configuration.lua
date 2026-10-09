@@ -22,7 +22,7 @@ local function array(value)
     return true
 end
 local schemas={
- general={showMenu=true,appearance=true,language=true},windows={enabled=true,shortcuts=true},
+ general={sleepShortcut=true,showMenu=true,appearance=true,language=true,tabOrder=true},windows={enabled=true,shortcuts=true},
  input={enabled=true,rules=true},clipboard={enabled=true,limit=true,minutes=true,images=true,persistent=true,excluded=true},
  system={network=true,cpu=true,memory=true,disk=true,ipv4=true,ipv6=true,mac=true,date=true,lunar=true},
  browser={enabled=true,defaultBrowser=true,rules=true,appRules=true},launcher={enabled=true,rules=true},
@@ -31,12 +31,13 @@ local ruleSchemas={input={bundleID=true,name=true,sourceID=true},browser={domain
 local function shortcut(value)
     return value==false or fields(value,{key=true,mods=true}) and array(value.mods)
 end
+local windowFields={};for _,action in ipairs(require("modules.windows").actions) do windowFields[action]=true end
 local function shape(name,value)
     if name=="popupShortcut" then return shortcut(value) end
     if not fields(value,schemas[name]) then return false end
     if name=="general" and value.language~=nil and type(value.language)~="string" then return false end
     if name=="windows" then
-        if not fields(value.shortcuts,{left=true,right=true,maximize=true,restore=true}) then return false end
+        if not fields(value.shortcuts,windowFields) then return false end
         for _,v in pairs(value.shortcuts) do if not shortcut(v) or v==false then return false end end
     end
     if value.rules then
@@ -57,7 +58,11 @@ function M.new(adapters,environment)
     local manager={}
     function manager.export(defaults)
         local modules={}
-        for _,name in ipairs(M.names) do modules[name]=copy(defaults and adapters[name].defaults() or adapters[name].get()) end
+        for _,name in ipairs(M.names) do
+            local value
+            if defaults then value=adapters[name].defaults() else value=adapters[name].get() end
+            modules[name]=copy(value)
+        end
         return {format="Nivlet",version=M.version,modules=modules}
     end
     function manager.prepare(document)
@@ -80,6 +85,7 @@ function M.new(adapters,environment)
             return true
         end
         local checks={}
+        if candidate.general.sleepShortcut then table.insert(checks,{{key="L",mods={"cmd"}},true}) end
         for _,item in pairs(candidate.windows.shortcuts) do table.insert(checks,{item,candidate.windows.enabled}) end
         for _,rule in ipairs(candidate.launcher.rules) do if rule.shortcut then table.insert(checks,{rule.shortcut,candidate.launcher.enabled}) end end
         if candidate.popupShortcut~=false then table.insert(checks,{candidate.popupShortcut,true}) end
@@ -89,7 +95,7 @@ function M.new(adapters,environment)
         if not ok then return nil,message end
         if selected.clipboard and not equal(candidate.clipboard,adapters.clipboard.get()) and environment.hasHistory() then
             local old,new=adapters.clipboard.get(),candidate.clipboard
-            if not new.enabled or (old.persistent and not new.persistent) or new.minutes<old.minutes or new.limit<old.limit or (old.images and not new.images) then
+            if not new.enabled or (old.persistent and not new.persistent) or (new.minutes>0 and (old.minutes==0 or new.minutes<old.minutes)) or new.limit<old.limit or (old.images and not new.images) then
                 return nil,i18n.t("导入会清理剪贴板历史，请先在剪贴板设置中单独处理")
             end
         end
@@ -101,6 +107,8 @@ function M.new(adapters,environment)
         local before=manager.export().modules
         local stored=environment.capture()
         local function release()
+            local general=copy(adapters.general.get())
+            if general.sleepShortcut then general.sleepShortcut=false;local ok,result=adapters.general.save(general);if not ok then error(result) end end
             for _,name in ipairs({"launcher","windows","popupShortcut"}) do
                 local ok,result=adapters[name].save(adapters[name].defaults())
                 if not ok then error(result) end
@@ -109,7 +117,7 @@ function M.new(adapters,environment)
         local function apply(config,selected)
             if selected.windows or selected.launcher or selected.popupShortcut then release() end
             for _,name in ipairs({"windows","popupShortcut","launcher","input","browser","system","general","clipboard"}) do
-                if (selected[name] or (selected.windows or selected.launcher or selected.popupShortcut) and (name=="windows" or name=="popupShortcut" or name=="launcher")) and not (name=="clipboard" and equal(config[name],adapters[name].get())) then
+                if (selected[name] or (selected.windows or selected.launcher or selected.popupShortcut) and (name=="windows" or name=="popupShortcut" or name=="launcher" or name=="general")) and not (name=="clipboard" and equal(config[name],adapters[name].get())) then
                     local ok,result=adapters[name].save(config[name]);if not ok then error(result) end
                 end
             end

@@ -1,6 +1,10 @@
 local i18n = require("modules.i18n")
 local M = {}
-local actions = {"left", "right", "maximize", "restore"}
+function M.systemAssigned(mods,key)
+    local assigned=hs.hotkey.systemAssigned(mods,key)
+    return assigned==true or type(assigned)=="table" and assigned.enabled==true
+end
+local actions = require("modules.windows").actions
 function M.defaults() return {enabled=false, shortcuts={}} end
 function M.validate(value)
     if type(value) ~= "table" or type(value.enabled) ~= "boolean" or type(value.shortcuts) ~= "table" then return nil, i18n.t("设置格式无效") end
@@ -11,9 +15,10 @@ function M.validate(value)
         if item then
             if type(item) ~= "table" or type(item.key) ~= "string" or type(item.mods) ~= "table" then return nil, i18n.t("快捷键格式无效") end
             local arrows={LEFT="left",RIGHT="right",UP="up",DOWN="down",ARROWLEFT="left",ARROWRIGHT="right",ARROWUP="up",ARROWDOWN="down",["←"]="left",["→"]="right",["↑"]="up",["↓"]="down"}
-            local key = arrows[item.key:upper()] or item.key:upper()
+            local special={ENTER="return",RETURN="return",["↩"]="return",["="]="=",["-"]="-"}
+            local key = arrows[item.key:upper()] or special[item.key:upper()] or item.key:upper()
             if key ~= "" then
-                if not key:match("^[A-Z0-9]$") and key~="left" and key~="right" and key~="up" and key~="down" then return nil, i18n.t("快捷键支持字母、数字或方向键") end
+                if not key:match("^[A-Z0-9]$") and key~="left" and key~="right" and key~="up" and key~="down" and key~="return" and key~="=" and key~="-" then return nil, i18n.t("快捷键支持字母、数字、方向键、Return、= 或 -") end
                 local flags = {}
                 for _, mod in ipairs(item.mods) do
                     if mod ~= "ctrl" and mod ~= "alt" and mod ~= "cmd" and mod ~= "shift" then return nil, i18n.t("未知修饰键") end

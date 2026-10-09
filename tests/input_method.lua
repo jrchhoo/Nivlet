@@ -24,3 +24,5 @@ current="source.a";m.start();assert(not m.config.enabled and starts==1)
 assert(m.save({enabled=true,rules={rule}}));assert(starts==2)
 m.configure({enabled=false,rules={}})
 print("Input rules validation, activation matching, no-op, lifecycle and persistence passed")
+
+assert(not m.validate({enabled=false,rules={rule,{bundleID='ORG.TEST.EDITOR',sourceID='source.a'}}}))

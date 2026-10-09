@@ -17,3 +17,20 @@ for input,expected in pairs({left="left",RIGHT="right",ArrowUp="up",["↓"]="dow
 end
 assert(not p.validate({enabled=true,shortcuts={left={key="ArrowLeft",mods={"ctrl"}},right={key="←",mods={"ctrl"}}}}))
 print("Arrow keys normalize to Runtime key names and duplicate aliases are rejected")
+
+for _,action in ipairs(w.actions) do
+    assert(p.validate({enabled=false,shortcuts={[action]={key="up",mods={"ctrl"}}}}).shortcuts[action])
+end
+for value,expected in pairs({Enter="return",Return="return",["="]="=",["-"]="-"}) do
+    assert(p.validate({enabled=false,shortcuts={grow={key=value,mods={"ctrl"}}}}).shortcuts.grow.key==expected)
+end
+assert(not p.validate({enabled=true,shortcuts={top={key="up",mods={"ctrl"}},grid9={key="ArrowUp",mods={"ctrl"}}}}))
+print("All extended window actions validate; special keys normalize and new-action duplicates are rejected")
+
+local oldHS=hs
+for _,case in ipairs({{value=false,expected=false},{value={enabled=false},expected=false},{value={enabled=true},expected=true},{value=true,expected=true}}) do
+ hs={hotkey={systemAssigned=function() return case.value end}}
+ assert(p.systemAssigned({'ctrl','alt'},'1')==case.expected)
+end
+hs=oldHS
+print('Disabled macOS system shortcut entries do not block available bindings')

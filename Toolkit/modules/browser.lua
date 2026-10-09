@@ -30,8 +30,8 @@ function M.validate(value)
     end
     config.appRules={};seen={}
     for _,rule in ipairs(appRules) do
-        if type(rule)~="table" or type(rule.bundleID)~="string" or not rule.bundleID:match("^[%w_%-]+%.[%w_.%-]+$") or type(rule.name)~="string" or #rule.name>256 or not known(rule.browser) or seen[rule.bundleID] then return nil,i18n.t("来源应用规则无效或重复") end
-        seen[rule.bundleID]=true;table.insert(config.appRules,{bundleID=rule.bundleID,name=rule.name,browser=rule.browser})
+        if type(rule)~="table" or type(rule.bundleID)~="string" or not rule.bundleID:match("^[%w_%-]+%.[%w_.%-]+$") or type(rule.name)~="string" or #rule.name>256 or not known(rule.browser) or seen[rule.bundleID:lower()] then return nil,i18n.t("来源应用规则无效或重复") end
+        seen[rule.bundleID:lower()]=true;table.insert(config.appRules,{bundleID=rule.bundleID,name=rule.name,browser=rule.browser})
     end
     return config
 end
@@ -53,7 +53,7 @@ function M.resolve(url,sourceBundle)
         for _,rule in ipairs(M.config.rules) do
             if host==rule.domain or rule.subdomains and host:sub(-#rule.domain-1)=="."..rule.domain then return rule.browser end
         end
-        for _,rule in ipairs(M.config.appRules or {}) do if sourceBundle==rule.bundleID then return rule.browser end end
+        for _,rule in ipairs(M.config.appRules or {}) do if type(sourceBundle)=="string" and sourceBundle:lower()==rule.bundleID:lower() then return rule.browser end end
     end
     return M.config.defaultBrowser
 end
@@ -69,6 +69,11 @@ function M.save(value)
     for _,rule in ipairs(config.rules) do if not hs.application.pathForBundleID(rule.browser) then return false,i18n.t("规则中的浏览器未安装") end end
     for _,rule in ipairs(config.appRules) do if not hs.application.pathForBundleID(rule.browser) then return false,i18n.t("来源应用规则中的浏览器未安装") end end
     M.config=config;hs.settings.set(settingsKey,config);return true,i18n.t("浏览器规则已保存")
+end
+function M.status()
+    local http=hs.urlevent.getDefaultHandler("http")
+    local https=hs.urlevent.getDefaultHandler("https")
+    return {active=http=="dev.local.DesktopToolkit" and https=="dev.local.DesktopToolkit"}
 end
 function M.start()
     M.config=M.validate(hs.settings.get(settingsKey)) or M.defaults()

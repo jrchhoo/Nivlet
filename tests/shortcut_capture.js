@@ -1,7 +1,7 @@
 // Exercise the actual settings keyboard handler without a native UI session.
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const html=fs.readFileSync('Toolkit/settings.html','utf8');
-const script=html.slice(html.indexOf("document.addEventListener('keydown',event=>{"),html.indexOf("send({action:'load'});"));
+const script=html.slice(html.indexOf("document.addEventListener('keydown',event=>{"),html.indexOf("// Settings status controls"));
 assert(script.startsWith('document.addEventListener'));
 const flags=Object.fromEntries(['ctrl','alt','cmd','shift'].map(mod=>['left-'+mod,{checked:false}]));
 let handler;
@@ -22,3 +22,8 @@ const launcherFlags=['ctrl','alt','cmd','shift'].map(mod=>({dataset:{mod},checke
 key.classList.contains=()=>true;key.closest=()=>({querySelectorAll:()=>launcherFlags});
 press('ArrowRight',{metaKey:true,shiftKey:true});assert.equal(key.value,'right');assert(launcherFlags[2].checked&&launcherFlags[3].checked&&!launcherFlags[0].checked);
 console.log('Actual keyboard handler: arrow capture, modifiers, Option letter, clear, navigation and launcher rows passed');
+
+press('Enter',{ctrlKey:true});assert.equal(key.value,'return');
+press('+',{code:'Equal',ctrlKey:true,shiftKey:true});assert.equal(key.value,'=');
+press('–',{code:'Minus',altKey:true});assert.equal(key.value,'-');
+console.log('Actual keyboard handler captures Return, shifted equals and Option minus');

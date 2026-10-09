@@ -8,7 +8,7 @@ window.runSettingsRegression=function(data){
     const browserID='com.example.toolkit-ui-browser';
     const check=(condition,message)=>{if(!condition)throw new Error(message)};
     try{
-        key.value='Z';limit.value='77';browser.checked=!original.browser;
+        key.value='Z';fillClipboardChoices('clipLimit',limitChoices,77);browser.checked=!original.browser;
         window.addInputRule({bundleID:inputID,name:'UI test input',sourceID:data.sources[0].id});
         window.addBrowserAppRule({bundleID:browserID,name:'UI test browser',browser:data.browsers[0].id});
         let captured;
@@ -23,7 +23,10 @@ window.runSettingsRegression=function(data){
         window.receive({...data,ok:true,action:'saveSystem',message:''});
         check(key.value==='Z'&&limit.value==='77'&&browser.checked!==original.browser,'Saving system erased another module draft');
         check(document.querySelector('#inputRows [data-bundle="'+inputID+'"]'),'Refresh erased unsaved rule');
-        check(!document.getElementById('clearClip'),'Clear history duplicated in settings');
+        const clear=document.getElementById('clearClip');check(clear.previousElementSibling.id==='refreshClip','Clear action not beside refresh');
+        const history=data.clipboard;receiveClipboard({...history,entries:[]},false);check(clear.disabled,'Empty history clear enabled');
+        receiveClipboard({...history,entries:[{id:987,time:Date.now()/1000,text:'UI fixture'}]},false);check(!clear.disabled,'Clear disabled with history');
+        send=body=>{captured=body};clear.click();check(captured.action==='clearClipboard','Clear action missing');send=original.send;receiveClipboard(history,false);
         addBrowserRule({domain:'ui-first.example',browser:data.browsers[0].id,subdomains:true});
         addBrowserRule({domain:'ui-second.example',browser:data.browsers[0].id,subdomains:true});
         const added=[...document.querySelectorAll('.browser-rule')].slice(-2);

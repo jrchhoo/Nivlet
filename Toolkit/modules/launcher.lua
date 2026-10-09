@@ -7,7 +7,7 @@ function M.validate(value)
     local result,apps,shortcuts={enabled=value.enabled,rules={}}, {}, {}
     for _,rule in ipairs(value.rules) do
         if type(rule)~='table' or type(rule.bundleID)~='string' or not rule.bundleID:match('^[%w_%-]+%.[%w_.%-]+$') then return nil,i18n.t('请选择要启动的应用') end
-        if apps[rule.bundleID] then return nil,i18n.t('同一应用只能配置一个启动快捷键') end
+        if apps[rule.bundleID:lower()] then return nil,i18n.t('同一应用只能配置一个启动快捷键') end
         local config,message=preferences.validate({enabled=false,shortcuts={left=rule.shortcut}})
         if not config then return nil,message end
         local shortcut=config.shortcuts.left
@@ -16,7 +16,7 @@ function M.validate(value)
             if shortcuts[signature] then return nil,i18n.t('不同应用不能使用相同快捷键') end
             shortcuts[signature]=true
         end
-        apps[rule.bundleID]=true
+        apps[rule.bundleID:lower()]=true
         table.insert(result.rules,{bundleID=rule.bundleID,name=type(rule.name)=='string' and rule.name or rule.bundleID,shortcut=shortcut})
     end
     return result
@@ -44,7 +44,7 @@ local function install(config)
         local shortcut=rule.shortcut
         if shortcut then
             if M.externalConflict(shortcut) then clearBindings();return false,i18n.t('应用快捷键与窗口管理或剪贴板菜单重复') end
-            if hs.hotkey.systemAssigned(shortcut.mods,shortcut.key) or not hs.hotkey.assignable(shortcut.mods,shortcut.key) then clearBindings();return false,i18n.t('快捷键被系统占用或无法注册：')..shortcut.key end
+            if preferences.systemAssigned(shortcut.mods,shortcut.key) or not hs.hotkey.assignable(shortcut.mods,shortcut.key) then clearBindings();return false,i18n.t('快捷键被系统占用或无法注册：')..shortcut.key end
             local bundleID=rule.bundleID
             local binding=hs.hotkey.bind(shortcut.mods,shortcut.key,function()
                 local ok,message=M.open(bundleID)

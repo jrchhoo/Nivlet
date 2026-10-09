@@ -48,3 +48,7 @@ git diff --check
 ## 名称兼容
 
 应用和项目显示名称已改为 Nivlet。已有开发用户的 Bundle ID、设置键和数据目录沿用 `dev.local.DesktopToolkit` / `desktoptoolkit.*`，避免改名清空设置与历史。它们是兼容标识，不是界面名称。上游 Hammerspoon 名称保留在来源、许可证和开发接口说明中。
+
+## 首版候选包
+
+产品版本读取根目录 `VERSION`，`NIVLET_BUILD_NUMBER` 指定 build（默认 1），避免显示 Runtime 上游版本。开发构建后运行 `sh scripts/package-local.sh`，在 `build/packages/` 生成本机 ZIP/DMG 与 SHA-256。当前为开发签名，不是正式分发链路；发布门槛见 [RELEASE-1.0.0.md](RELEASE-1.0.0.md)。

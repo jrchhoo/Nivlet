@@ -5,7 +5,7 @@ function M.defaults()
     return {enabled=false,limit=50,minutes=30,images=true,persistent=false,excluded={"com.apple.Passwords","com.1password.1password","com.agilebits.onepassword7","com.bitwarden.desktop"}}
 end
 function M.validate(value)
-    if type(value)~="table" or type(value.enabled)~="boolean" or type(value.limit)~="number" or value.limit%1~=0 or value.limit<10 or value.limit>100 or type(value.minutes)~="number" or value.minutes%1~=0 or value.minutes<1 or value.minutes>120 or type(value.excluded)~="table" then return nil,i18n.t("容量须为 10–100 条，保留时间须为 1–120 分钟") end
+    if type(value)~="table" or type(value.enabled)~="boolean" or type(value.limit)~="number" or value.limit%1~=0 or value.limit<10 or value.limit>100 or type(value.minutes)~="number" or value.minutes%1~=0 or value.minutes<0 or value.minutes>1440 or type(value.excluded)~="table" then return nil,i18n.t("容量须为 10–100 条，保留时间须为 1–1440 分钟或 0（永久）") end
     if value.images~=nil and type(value.images)~="boolean" or value.persistent~=nil and type(value.persistent)~="boolean" then return nil,i18n.t("图片和缓存设置格式无效") end
     local config,seen={enabled=value.enabled,limit=value.limit,minutes=value.minutes,images=value.images~=false,persistent=value.persistent==true,excluded={}},{}
     for _,id in ipairs(value.excluded) do
@@ -53,7 +53,7 @@ function M.prune()
     local cutoff=hs.timer.secondsSinceEpoch()-M.config.minutes*60
     local imageCount,textCount=0,0
     for i=#M.entries,1,-1 do
-        if M.entries[i].time<=cutoff then remove(M.entries[i]);table.remove(M.entries,i);changed=true end
+        if M.config.minutes>0 and M.entries[i].time<=cutoff then remove(M.entries[i]);table.remove(M.entries,i);changed=true end
     end
     local keep={}
     for _,entry in ipairs(M.entries) do
@@ -164,6 +164,14 @@ function M.copy(id,target)
     return false,i18n.t("记录已过期或被清除")
 end
 function M.clear() for _,entry in ipairs(M.entries) do remove(entry) end;M.entries={};M.persist();return true,i18n.t("历史已清空") end
+function M.confirmClear()
+    if hs.dialog.blockAlert(i18n.t("清空剪贴板历史？"),i18n.t("将删除 Nivlet 的全部剪贴板历史和缓存，并清空系统当前剪贴板。此操作无法撤销。"),i18n.t("清空"),i18n.t("取消"),"warning")==i18n.t("清空") then
+        hs.pasteboard.clearContents()
+        M.lastCount=hs.pasteboard.changeCount()
+        M.clear()
+        return true,i18n.t("历史和系统剪贴板已清空")
+    end
+end
 function M.preview(id)
     M.prune()
     for _,entry in ipairs(M.entries) do
@@ -183,27 +191,77 @@ function M.snapshot()
     end
     return {config=M.config,paused=M.paused,entries=entries}
 end
+local textMenuIcon
+local function menuThumbnail(image,kind)
+    local canvas=hs.canvas.new({x=0,y=0,w=24,h=24})
+    canvas[1]={type="rectangle",action="strokeAndFill",fillColor={white=.5,alpha=.12},strokeColor={white=.5,alpha=.3},strokeWidth=1,roundedRectRadii={xRadius=5,yRadius=5},frame={x=.5,y=.5,w=23,h=23}}
+    canvas[2]=image and {type="image",image=image,imageAlignment="center",imageScaling="scaleToFit",frame={x=2,y=2,w=20,h=20}} or {type="text",text=kind=="image" and "▧" or "T",textAlignment="center",textColor={white=.6},textSize=14,frame={x=0,y=3,w="100%",h=18}}
+    local result=canvas:imageFromCanvas();canvas:delete();return result
+end
+local function menuLabel(text)
+    text=text:gsub("%s+"," "):gsub("^%s+",""):gsub("%s+$","")
+    local length=utf8.len(text)
+    if not length then return text:sub(1,40)..(#text>40 and "…" or "") end
+    if hs.drawing and hs.drawing.getTextDrawingSize then
+        local function fits(value) return hs.drawing.getTextDrawingSize(value,{size=14}).w<=240 end
+        if fits(text) then return text end
+        local low,high,best=1,length,""
+        while low<=high do
+            local middle=math.floor((low+high)/2)
+            local candidate=text:sub(1,utf8.offset(text,middle+1)-1)
+            if fits(candidate.."…") then best=candidate;low=middle+1 else high=middle-1 end
+        end
+        return best.."…"
+    end
+    return length>40 and text:sub(1,utf8.offset(text,41)-1).."…" or text
+end
 function M.menuItems()
     M.prune()
     local target=hs.application.frontmostApplication()
     local menu={
-        {title=M.config.enabled and (M.paused and i18n.t("已暂停记录") or i18n.t("正在记录")) or i18n.t("历史记录未启用"),disabled=true},
-        {title=i18n.t("搜索历史…"),fn=function() M.openSettings("history") end},
-        {title=M.paused and i18n.t("恢复记录") or i18n.t("暂停记录"),disabled=not M.config.enabled,fn=function() M.pause() end},
+        {title=i18n.t("清空历史…"),disabled=#M.entries==0,fn=function() M.confirmClear() end},
         {title="-"},
     }
-    for _,entry in ipairs(M.entries) do
-        local text=(entry.text or i18n.t("图片 ")..os.date("%H:%M:%S",math.floor(entry.time))):gsub("[\r\n\t]"," ")
-        local length=utf8.len(text)
-        if length and length>40 then text=text:sub(1,utf8.offset(text,41)-1).."…" end
-        table.insert(menu,{title=text,image=entry.thumb,fn=function(mods) local ok,message=M.copy(entry.id,mods and mods.alt and target or nil);if not ok then hs.alert.show(message) end end})
+    local ordered={}
+    for _,entry in ipairs(M.entries) do if entry.kind=="image" then table.insert(ordered,entry) end end
+    local imageCount=#ordered
+    for _,entry in ipairs(M.entries) do if entry.kind~="image" then table.insert(ordered,entry) end end
+    for index,entry in ipairs(ordered) do
+        if imageCount>0 and index==imageCount+1 then table.insert(menu,{title="-"}) end
+        local isImage=entry.kind=="image"
+        local text=entry.text and menuLabel(entry.text) or i18n.t("图片 ")..os.date("%H:%M:%S",math.floor(entry.time))
+        if isImage and entry.image then
+            local size=entry.image:size()
+            if not entry.menuBytes then
+                local encoded=entry.image:encodeAsURLString(true,"PNG")
+                local base64=encoded and encoded:match("base64,(.*)")
+                entry.menuBytes=base64 and math.floor(#base64*3/4)-(base64:match("==$") and 2 or base64:match("=$") and 1 or 0) or 0
+            end
+            local bytes=entry.menuBytes
+            local amount=bytes<1048576 and string.format("%.0f KB",bytes/1024) or string.format("%.1f MB",bytes/1048576)
+            text=string.format("%s %.0f×%.0f · %s · %s",i18n.t("图片"),size.w,size.h,amount,os.date("%m-%d %H:%M",math.floor(entry.time)))
+        end
+        local icon
+        if isImage then entry.menuThumb=entry.menuThumb or menuThumbnail(entry.image or entry.thumb,"image");icon=entry.menuThumb
+        else textMenuIcon=textMenuIcon or menuThumbnail(nil,"text");icon=textMenuIcon end
+        local function select(mods) local ok,message=M.copy(entry.id,mods and mods.alt and target or nil);if not ok then hs.alert.show(message) end end
+        local submenu
+        if isImage and entry.image then
+            if not entry.menuPreview then
+                local size=entry.image:size();local scale=math.min(1,360/size.w,260/size.h)
+                local canvas=hs.canvas.new({x=0,y=0,w=size.w*scale,h=size.h*scale})
+                canvas[1]={type="image",image=entry.image,imageScaling="scaleToFit",frame={x=0,y=0,w="100%",h="100%"}}
+                entry.menuPreview=canvas:imageFromCanvas();canvas:delete()
+            end
+            submenu={{title="",image=entry.menuPreview,tooltip=text,fn=select}}
+        end
+        table.insert(menu,{title=text,image=icon,tooltip=entry.text or text,menu=submenu,fn=select})
     end
     if #M.entries==0 then table.insert(menu,{title=i18n.t("暂无历史"),disabled=true}) end
     table.insert(menu,{title="-"})
     table.insert(menu,{title=i18n.t("剪贴板设置…"),fn=function() M.openSettings("settings") end})
-    table.insert(menu,{title=i18n.t("清空历史…"),disabled=#M.entries==0,fn=function()
-        if hs.dialog.blockAlert(i18n.t("清空剪贴板历史？"),i18n.t("仅移除此 App 的历史记录和缓存，不改系统当前剪贴板。"),i18n.t("清空"),i18n.t("取消"),"warning")==i18n.t("清空") then M.clear() end
-    end})
+    table.insert(menu,{title=i18n.t("搜索历史…"),fn=function() M.openSettings("history") end})
+    table.insert(menu,{title=M.paused and i18n.t("恢复记录") or i18n.t("暂停记录"),disabled=not M.config.enabled,fn=function() M.pause() end})
     return menu
 end
 function M.start()
@@ -216,7 +274,8 @@ function M.showPopup()
 end
 function M.startMenu(openSettings)
     M.openSettings=openSettings
-    M.menu=hs.menubar.new():setTitle("📋"):setTooltip(i18n.t("Nivlet 剪贴板历史"))
+    local icon=assert(hs.image.imageFromPath(hs.processInfo.bundlePath.."/Contents/Resources/Toolkit/assets/document.on.clipboard.png")):size({w=18,h=18})
+    M.menu=hs.menubar.new(true,"NivletClipboard"):setTitle(""):setIcon(icon,true):setTooltip(i18n.t("Nivlet 剪贴板历史"))
     M.menu:setMenu(M.menuItems)
     M.popup=hs.menubar.new(false):setMenu(M.menuItems)
 end

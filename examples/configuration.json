@@ -5,7 +5,8 @@
     "general": {
       "showMenu": true,
       "appearance": "system",
-      "language": "system"
+      "language": "system",
+      "sleepShortcut": false
     },
     "windows": {
       "enabled": false,

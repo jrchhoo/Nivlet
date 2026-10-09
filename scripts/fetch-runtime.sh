@@ -16,3 +16,8 @@ git -C "$upstream_dir" apply "$project_dir/patches/branding.patch"
 git -C "$upstream_dir" apply "$project_dir/patches/general-appearance.patch"
 git -C "$upstream_dir" apply "$project_dir/patches/browser-startup.patch"
 cp "$project_dir/Hammerspoon-Downstream.xcconfig" "$upstream_dir/Hammerspoon-Downstream.xcconfig"
+
+git -C "$upstream_dir" apply "$project_dir/patches/single-settings.patch"
+git -C "$upstream_dir" apply "$project_dir/patches/menu-image-visibility.patch"
+
+git -C "$upstream_dir" apply "$project_dir/patches/browser-sender.patch"

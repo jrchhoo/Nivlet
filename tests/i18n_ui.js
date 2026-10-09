@@ -12,7 +12,7 @@ window.runI18nRegression=function(data){
         check(document.getElementById('tab-generalSection').textContent==='General','English tab');
         check(document.getElementById('pauseClip').textContent==='Pause Recording','Pause text');
         check(document.getElementById('status').textContent==='Saved','English status');
-        check(document.querySelector('#clipHistory span').textContent==='复制','User clipboard content changed');
+        check(document.querySelector('#clipHistory .clip-card-text').textContent==='复制','User clipboard content changed');
         check(document.querySelector('#inputRows [data-bundle="'+inputID+'"] span').textContent.trim()==='通用','App name translated');
         update('en','通用设置已保存',true);
         check(document.getElementById('status').textContent==='General settings saved','Status reused stale translation');

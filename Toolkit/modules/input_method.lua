@@ -19,9 +19,9 @@ function M.validate(value, available)
     local result, used = {enabled=value.enabled,rules={}}, {}
     for _, rule in ipairs(value.rules) do
         if type(rule) ~= "table" or type(rule.bundleID) ~= "string" or not rule.bundleID:match("^[%w_%-]+%.[%w_.%-]+$") or type(rule.sourceID) ~= "string" or rule.sourceID == "" then return nil, i18n.t("请选择应用和输入法") end
-        if used[rule.bundleID] then return nil, i18n.t("同一应用只能配置一条输入法规则") end
+        if used[rule.bundleID:lower()] then return nil, i18n.t("同一应用只能配置一条输入法规则") end
         if value.enabled and available and not available[rule.sourceID] then return nil, i18n.t("输入法不可用，请重新选择：") .. rule.sourceID end
-        used[rule.bundleID] = true
+        used[rule.bundleID:lower()] = true
         table.insert(result.rules, {bundleID=rule.bundleID,sourceID=rule.sourceID,name=type(rule.name)=="string" and rule.name or rule.bundleID})
     end
     return result

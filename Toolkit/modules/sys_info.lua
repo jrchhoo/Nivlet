@@ -30,7 +30,9 @@ function M.speed(bytes)
     return string.format("%.1f MB/s",bytes/1048576)
 end
 function M.accept(data,interface,now)
+    M.lastSample=now
     local sample=data.interfaces and data.interfaces[interface]
+    M.networkReady=sample and M.previous and M.previous.interface==interface and now>M.previous.time and sample.rx>=M.previous.rx and sample.tx>=M.previous.tx or false
     M.rx,M.tx=0,0
     if sample and M.previous and M.previous.interface==interface and now>M.previous.time then
         local elapsed=now-M.previous.time
@@ -38,23 +40,25 @@ function M.accept(data,interface,now)
         M.tx=math.max(0,sample.tx-M.previous.tx)/elapsed
     end
     M.previous=sample and {interface=interface,rx=sample.rx,tx=sample.tx,time=now} or nil
-    M.mac=sample and sample.mac or nil
+    local mac=sample and sample.mac or nil
+    M.macRestricted=type(mac)=="string" and mac:lower()=="02:00:00:00:00:00"
+    M.mac=not M.macRestricted and mac or nil
     M.lunar=data.lunar or "N/A"
 end
 local function copyItem(title,value)
     return {title=title..": "..value,fn=function() hs.pasteboard.setContents(value) end}
 end
-function M.menuItems()
+local function readings()
     local menu={}
     local cpu=hs.host.cpuUsageTicks()
     if cpu and cpu.overall then
         local overall=cpu.overall
         local total=overall.user+overall.nice+overall.system+overall.idle
         local active=total-overall.idle
-        local percentage=0
+        local percentage
         if M.cpuPrevious and total>M.cpuPrevious.total then percentage=100*(active-M.cpuPrevious.active)/(total-M.cpuPrevious.total) end
         M.cpuPrevious={active=active,total=total}
-        table.insert(menu,{title=string.format("CPU: %.0f%% / %d Core",percentage,#cpu),disabled=true})
+        table.insert(menu,{title=(percentage and string.format("CPU: %.0f%% / %d Core",percentage,#cpu) or "CPU: N/A"),disabled=true})
     end
     local vm=hs.host.vmStat()
     if vm and vm.memSize and vm.memSize>0 then
@@ -72,12 +76,30 @@ function M.menuItems()
     for _,kind in ipairs({"IPv4","IPv6"}) do
         for _,address in ipairs(details and details[kind] and details[kind].Addresses or {}) do table.insert(menu,copyItem(kind=="IPv4" and "LAN" or "IPv6",address)) end
     end
-    if M.mac then table.insert(menu,copyItem("MAC",M.mac)) end
+    if M.macRestricted then table.insert(menu,{title="MAC: "..i18n.t("系统已隐藏"),disabled=true})
+    elseif M.mac then table.insert(menu,copyItem("MAC",M.mac)) end
     table.insert(menu,{title=i18n.t("WAN / Loc: 未开启外部查询"),disabled=true})
     table.insert(menu,{title="-"})
     local weekdays={i18n.t("周日"),i18n.t("周一"),i18n.t("周二"),i18n.t("周三"),i18n.t("周四"),i18n.t("周五"),i18n.t("周六")}
     table.insert(menu,{title="Date: "..os.date("%Y-%m-%d").." "..weekdays[os.date("*t").wday],fn=function() hs.pasteboard.setContents(os.date("%Y-%m-%d %H:%M:%S")) end})
     table.insert(menu,copyItem("Lunar",M.lunar))
+    return menu
+end
+function M.snapshot()
+    local values={}
+    local prefixes={CPU="cpu",MEM="memory",Disk="disk",LAN="ipv4",IPv6="ipv6",MAC="mac",Date="date",Lunar="lunar"}
+    for _,item in ipairs(readings()) do
+        local prefix,value=item.title:match("^(%w+): (.*)$")
+        local field=prefixes[prefix]
+        if field then values[field]=values[field] and (values[field].."\n"..value) or value end
+    end
+    local now=hs.timer.secondsSinceEpoch()
+    values.network=M.networkReady and M.lastSample and now-M.lastSample<6 and ("↑ "..M.speed(M.tx).."  ↓ "..M.speed(M.rx)) or "N/A"
+    for _,field in ipairs(M.fields) do values[field]=values[field] or "N/A" end
+    return values
+end
+function M.menuItems()
+    local menu=readings()
     local prefixes={CPU="cpu",MEM="memory",Disk="disk",LAN="ipv4",IPv6="ipv6",MAC="mac",Date="date",Lunar="lunar"}
     local filtered={}
     for _,item in ipairs(menu) do
@@ -120,7 +142,7 @@ function M.start(openSettings)
         local c=cpu.overall
         M.cpuPrevious={active=c.user+c.nice+c.system,total=c.user+c.nice+c.system+c.idle}
     end
-    M.menu=hs.menubar.new():setTitle("▲ — / ▼ —"):setTooltip(i18n.t("Nivlet 系统信息"))
+    M.menu=hs.menubar.new(true,"NivletSystemInfo"):setTitle("▲ — / ▼ —"):setTooltip(i18n.t("Nivlet 系统信息"))
     M.menu:setMenu(M.menuItems)
     M.draw();M.scan();M.timer=hs.timer.doEvery(2,M.scan)
 end
