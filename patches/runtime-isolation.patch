@@ -296,3 +296,12 @@ index 4c3e3ed..14c8dbf 100644
      lua_getfield(L, -1, "shutdownCallback");
  
      if (lua_type(L, -1) == LUA_TNIL) {
+diff --git a/Hammerspoon/Build Configs/Hammerspoon-Release.xcconfig b/Hammerspoon/Build Configs/Hammerspoon-Release.xcconfig
+--- a/Hammerspoon/Build Configs/Hammerspoon-Release.xcconfig
++++ b/Hammerspoon/Build Configs/Hammerspoon-Release.xcconfig
+@@ -19,4 +19,4 @@
+ CODE_SIGN_IDENTITY = Developer ID Application
+ DEVELOPMENT_TEAM = VQCYSNZB89
+ 
+-#include? "../../../Hammerspoon-Downstream.xcconfig"
++#include? "../../Hammerspoon-Downstream.xcconfig"

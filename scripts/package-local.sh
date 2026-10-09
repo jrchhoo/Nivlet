@@ -2,7 +2,9 @@
 # Local validation artifacts. Developer ID signing and notarization are separate release gates.
 set -eu
 project_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
-app_path="$project_dir/build/DerivedData/Build/Products/Debug/Nivlet.app"
+configuration=${NIVLET_BUILD_CONFIGURATION:-Debug}
+case "$configuration" in Debug|Release) ;; *) echo "Unsupported build configuration: $configuration" >&2; exit 1 ;; esac
+app_path="$project_dir/build/DerivedData/Build/Products/$configuration/Nivlet.app"
 version=$(cat "$project_dir/VERSION")
 build=$(/usr/libexec/PlistBuddy -c Print:CFBundleVersion "$app_path/Contents/Info.plist")
 test "$(/usr/libexec/PlistBuddy -c Print:CFBundleShortVersionString "$app_path/Contents/Info.plist")" = "$version"
@@ -11,6 +13,7 @@ arch=$(lipo -archs "$app_path/Contents/MacOS/Nivlet" | tr ' ' '-')
 output="$project_dir/build/packages"
 mkdir -p "$output"
 base="Nivlet-$version-build$build-$arch-local"
+if [ "$configuration" = Release ]; then base="$base-release"; fi
 stage=$(mktemp -d "$project_dir/build/package-stage.XXXXXX")
 trap 'rm -rf "$stage"' EXIT HUP INT TERM
 ditto "$app_path" "$stage/Nivlet.app"

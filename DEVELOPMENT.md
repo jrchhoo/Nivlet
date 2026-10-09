@@ -52,3 +52,14 @@ git diff --check
 ## 首版候选包
 
 产品版本读取根目录 `VERSION`，`NIVLET_BUILD_NUMBER` 指定 build（默认 1），避免显示 Runtime 上游版本。开发构建后运行 `sh scripts/package-local.sh`，在 `build/packages/` 生成本机 ZIP/DMG 与 SHA-256。当前为开发签名，不是正式分发链路；发布门槛见 [RELEASE-1.0.0.md](RELEASE-1.0.0.md)。
+
+## 免费的 Release 构建准备
+
+无需付费开发者账号即可验证 Release 配置；此流程仍使用 ad-hoc 签名，不启动或安装 App：
+
+```sh
+NIVLET_BUILD_NUMBER=4 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer sh scripts/build-release.sh
+NIVLET_BUILD_CONFIGURATION=Release sh scripts/package-local.sh
+```
+
+产物位于 `build/DerivedData/Build/Products/Release/Nivlet.app`，安装包名称带 `-release`，与 Debug 包区分。正式签名、公证及测试者验收见 [分发准备](DISTRIBUTION.md)，许可核查见 [第三方许可工程核查](THIRD-PARTY-AUDIT.md)。

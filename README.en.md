@@ -21,6 +21,8 @@
 
 ## Current release
 
+Source checkpoint: `v1.0.0-rc.4` (Release Build 4 installed locally; full manual validation pending). Downloads below remain rc.3 / Build 3.
+
 **v1.0.0-rc.3 · App 1.0.0 / Build 3 · Pre-release**
 
 DMG, ZIP and SHA-256 files are available for Apple Silicon (arm64). The bundle declares macOS 13.0 as its minimum; other macOS versions, Intel, multiple displays and installation on other Macs have not been fully validated.
@@ -125,6 +127,7 @@ These detailed documents are currently in Chinese:
 - [Configuration guide](CONFIGURATION.md)
 - [Release scope and known limitations](RELEASE-1.0.0.md)
 - [Validation records](VALIDATION.md)
+- [Installation and upgrade test checklist](DISTRIBUTION.md) (Chinese)
 - [Development and building](DEVELOPMENT.md)
 - [Roadmap](ROADMAP.md)
 

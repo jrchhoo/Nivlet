@@ -1,6 +1,8 @@
 # Nivlet for Mac 1.0.0 候选版说明
 
-当前版本：**v1.0.0-rc.3**；应用内版本 **1.0.0 / Build 3**。Build 3 将关于页展示名称改为 Nivlet for Mac，功能沿用已验收的 Build 2；新包已构建并校验，未替换本机安装版。此版本为公开测试包，尚非正式版。
+源码阶段：**v1.0.0-rc.4**；本机安装版本 **1.0.0 / Build 4（Release）**。Build 4 增加可复现的本地 Release 构建与打包流程，修复 Release 品牌配置路径并排除 Sanitizer 调试库；已安装启动，关于页版本与辅助功能开启状态已确认。整体人工测试尚未完成。
+
+公开可下载安装包仍为 **v1.0.0-rc.3 / Build 3**，不是上述 Build 4。rc.4 仅归档源码与文档，不覆盖旧发布附件。
 
 ## 包含的功能
 
@@ -40,4 +42,10 @@
 
 安装时将 Nivlet.app 拖入 Applications。升级只替换 App，保留数据目录；开发签名变更可能要求重新授权辅助功能。所有可编辑设置在窗口右下角保存，权限检测和历史操作即时执行。来源应用分流需将 macOS 默认网页浏览器选为 Nivlet。
 
-`VERSION` 为产品版本来源，`NIVLET_BUILD_NUMBER` 指定 build。重现本候选使用 `NIVLET_BUILD_NUMBER=3` 构建，再运行 `sh scripts/package-local.sh`。详细流程见 [DEVELOPMENT.md](DEVELOPMENT.md)。
+`VERSION` 为产品版本来源，`NIVLET_BUILD_NUMBER` 指定 build。重现本机 Build 4 使用 `NIVLET_BUILD_NUMBER=4 sh scripts/build-release.sh`，再运行 `NIVLET_BUILD_CONFIGURATION=Release sh scripts/package-local.sh`（完整 Xcode 环境按 DEVELOPMENT.md 设置）。详细流程见 [DEVELOPMENT.md](DEVELOPMENT.md)。
+
+## Build 4 阶段补记（2026-10-09）
+
+17 个 Lua 套件及两项 Node 回归通过；Release 完整构建、严格 ad-hoc 签名、ZIP/DMG 完整性及 SHA-256 通过。101 个 Mach-O 文件均含 x86_64/arm64，未发现开发机外部加载路径或 ASan/UBSan 运行库；不能据此声称 Intel 或其他 Mac 已验收。此前 Build 2 的真实窗口/粘贴证据不能替代 Build 4 完整人工验收。
+
+用户新反馈的浏览器分流短暂闪出 Nivlet 界面尚未复现定位、尚未修复；应用启动即时反馈、目标应用替换、权限区域收敛、WAN 查询和可编辑默认配置均仅进入计划，见 ROADMAP.md。第三方许可已补工程核查文档，完整人工复核未关闭。

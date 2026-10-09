@@ -1,12 +1,20 @@
 #!/bin/sh
 set -eu
 project_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+configuration=${NIVLET_BUILD_CONFIGURATION:-Debug}
+case "$configuration" in Debug|Release) ;; *) echo "Unsupported build configuration: $configuration" >&2; exit 1 ;; esac
 sh "$project_dir/scripts/preflight.sh"
 upstream_dir="$project_dir/vendor/hammerspoon"
 python3 "$project_dir/scripts/prepare-icon.py"
 cd "$upstream_dir"
-xcodebuild -workspace Hammerspoon.xcworkspace -scheme Hammerspoon -configuration Debug -derivedDataPath "$project_dir/build/DerivedData" CODE_SIGNING_ALLOWED=NO CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER=NO build
-app_path="$project_dir/build/DerivedData/Build/Products/Debug/Nivlet.app"
+scheme=Hammerspoon
+set --
+if [ "$configuration" = Release ]; then
+    scheme=Release
+    set -- -enableAddressSanitizer NO -enableUndefinedBehaviorSanitizer NO
+fi
+xcodebuild -workspace Hammerspoon.xcworkspace -scheme "$scheme" -configuration "$configuration" -derivedDataPath "$project_dir/build/DerivedData" "$@" CODE_SIGNING_ALLOWED=NO DEVELOPMENT_TEAM= CODE_SIGN_IDENTITY= CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER=NO build
+app_path="$project_dir/build/DerivedData/Build/Products/$configuration/Nivlet.app"
 test -d "$app_path"
 /usr/libexec/PlistBuddy -c Print:CFBundleIdentifier "$app_path/Contents/Info.plist" | /usr/bin/grep -qx dev.local.DesktopToolkit
 mkdir -p "$app_path/Contents/Resources/Toolkit"
@@ -19,5 +27,5 @@ xcrun clang -fobjc-arc -Wall -Wextra -Werror -arch arm64 -arch x86_64 -mmacosx-v
 python3 "$project_dir/scripts/configure-url-types.py" "$app_path/Contents/Info.plist"
 codesign --force --deep --sign - "$app_path"
 codesign --verify --deep --strict "$app_path"
-echo "Local probe built: $app_path"
+echo "Local $configuration build: $app_path"
 echo "App has not been launched. Complete isolation review before running it."
