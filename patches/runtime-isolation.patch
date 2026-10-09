@@ -8,10 +8,42 @@ index f5cc96c..dc33d2a 100644
  #include "Hammerspoon-Base.xcconfig"
 -#include? "../../../Hammerspoon-Downstream.xcconfig"
 +#include? "../../Hammerspoon-Downstream.xcconfig"
+diff --git a/extensions/webview/libwebview.m b/extensions/webview/libwebview.m
+index 9740d89..b14166d 100644
+--- a/extensions/webview/libwebview.m
++++ b/extensions/webview/libwebview.m
+@@ -88,7 +88,7 @@ void delayUntilViewStopsLoading(HSWebViewView *theView, dispatch_block_t block)
+ 
+         // Configure the window
+         self.releasedWhenClosed = NO;
+-        self.backgroundColor    = [NSColor clearColor];
++        self.backgroundColor    = [NSColor windowBackgroundColor];
+         self.opaque             = YES;
+         self.hasShadow          = NO;
+         self.ignoresMouseEvents = NO;
+@@ -1264,6 +1264,9 @@ static int webview_transparent(lua_State *L) {
+         lua_pushboolean(L, !(BOOL)theWindow.opaque);
+     } else {
+         theWindow.opaque = !(lua_toboolean(L, 2));
++        theWindow.backgroundColor = theWindow.opaque ? [NSColor windowBackgroundColor] : [NSColor clearColor];
++        // Draw the titlebar over the opaque window color instead of the system material.
++        theWindow.titlebarAppearsTransparent = theWindow.opaque;
+         [theWindow.contentView setValue:@(lua_toboolean(L, 2)) forKey:@"drawsTransparentBackground"];
+         lua_settop(L, 1) ;
+     }
 diff --git a/Hammerspoon/Hammerspoon-Info.plist b/Hammerspoon/Hammerspoon-Info.plist
-index 2e2764f..98f5534 100644
+index 2e2764f..8af0874 100644
 --- a/Hammerspoon/Hammerspoon-Info.plist
 +++ b/Hammerspoon/Hammerspoon-Info.plist
+@@ -139,7 +139,7 @@
+ 	<key>CFBundleExecutable</key>
+ 	<string>${EXECUTABLE_NAME}</string>
+ 	<key>CFBundleIconFile</key>
+-	<string>Hammerspoon</string>
++	<string>Nivlet</string>
+ 	<key>CFBundleIdentifier</key>
+ 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+ 	<key>CFBundleInfoDictionaryVersion</key>
 @@ -152,45 +152,6 @@
  	<string>$(MARKETING_VERSION)</string>
  	<key>CFBundleSignature</key>
@@ -58,8 +90,27 @@ index 2e2764f..98f5534 100644
  	<key>CFBundleVersion</key>
  	<string>$(CURRENT_PROJECT_VERSION)</string>
  	<key>INIntentsSupported</key>
-@@ -226,39 +187,6 @@
- 	<string>Some Hammerspoon extensions (such as hs.noises) require access to the microphone.</string>
+@@ -211,54 +172,21 @@
+ 		<true/>
+ 	</dict>
+ 	<key>NSAppleEventsUsageDescription</key>
+-	<string>Hammerspoon needs to send events to automate applications.</string>
++	<string>Nivlet needs to send events to automate applications.</string>
+ 	<key>NSAppleScriptEnabled</key>
+ 	<true/>
+ 	<key>NSCameraUsageDescription</key>
+-	<string>Some Hammerspoon extensions require access to the camera.</string>
++	<string>Some Nivlet extensions require access to the camera.</string>
+ 	<key>NSHumanReadableCopyright</key>
+ 	<string>Released under MIT license.</string>
+ 	<key>NSLocationAlwaysUsageDescription</key>
+-	<string>Some Hammerspoon extensions (such as hs.location) require access to your location.</string>
++	<string>Some Nivlet extensions (such as hs.location) require access to your location.</string>
+ 	<key>NSMainNibFile</key>
+ 	<string>MainMenu</string>
+ 	<key>NSMicrophoneUsageDescription</key>
+-	<string>Some Hammerspoon extensions (such as hs.noises) require access to the microphone.</string>
++	<string>Some Nivlet extensions (such as hs.noises) require access to the microphone.</string>
  	<key>NSPrincipalClass</key>
  	<string>SentryCrashExceptionApplication</string>
 -	<key>NSServices</key>
@@ -116,22 +167,31 @@ index 2e2764f..98f5534 100644
  		</dict>
  	</array>
 +	<key>CFBundleDisplayName</key>
-+	<string>DesktopToolkit Dev</string>
++	<string>Nivlet</string>
 +	<key>SUEnableAutomaticChecks</key>
 +	<false/>
  </dict>
  </plist>
 diff --git a/Hammerspoon/MJAppDelegate.m b/Hammerspoon/MJAppDelegate.m
-index 1f0d2fb..a05174d 100644
+index 1f0d2fb..73d9333 100644
 --- a/Hammerspoon/MJAppDelegate.m
 +++ b/Hammerspoon/MJAppDelegate.m
+@@ -159,7 +159,7 @@
+ 
+         [alert addButtonWithTitle:@"Cancel"];
+         [alert setMessageText:@"Do you want to delete the preferences?"];
+-        [alert setInformativeText:@"Deleting the preferences will reset all Hammerspoon settings (including everything that uses hs.settings) to their defaults. This does not remove anything in ~/.hammerspoon/"];
++        [alert setInformativeText:@"Deleting the preferences will reset all Nivlet settings to their defaults. Cached files in the application support directory are not removed."];
+         [alert setAlertStyle:NSAlertStyleWarning];
+ 
+         if ([alert runModal] == NSAlertFirstButtonReturn) {
 @@ -214,8 +214,30 @@
          [self showConsoleWindow:nil];
      } else {
          // No test environment detected, this is a live user run
 -        NSString* userMJConfigFile = [[NSUserDefaults standardUserDefaults] stringForKey:@"MJConfigFile"];
 -        if (userMJConfigFile) MJConfigFile = userMJConfigFile ;
-+        // DesktopToolkit owns its bootstrap and never loads personal Hammerspoon config.
++        // Nivlet owns its bootstrap and never loads personal Hammerspoon config.
 +        NSBundle *bundle = [NSBundle mainBundle];
 +        if (![bundle.bundleIdentifier isEqualToString:@"dev.local.DesktopToolkit"]) abort();
 +        // Do not allow competing instances to register the same global shortcuts.
@@ -146,13 +206,13 @@ index 1f0d2fb..a05174d 100644
 +        NSString *directory = [support stringByAppendingPathComponent:bundle.bundleIdentifier];
 +        NSError *bootstrapError = nil;
 +        if (![[NSFileManager defaultManager] createDirectoryAtPath:directory withIntermediateDirectories:YES attributes:nil error:&bootstrapError]) {
-+            NSLog(@"DesktopToolkit bootstrap directory failed: %@", bootstrapError);
++            NSLog(@"Nivlet bootstrap directory failed: %@", bootstrapError);
 +            abort();
 +        }
 +        MJConfigFile = [directory stringByAppendingPathComponent:@"init.lua"];
 +        NSString *bootstrap = @"dofile(hs.processInfo.bundlePath .. \"/Contents/Resources/Toolkit/init.lua\")\n";
 +        if (![bootstrap writeToFile:MJConfigFile atomically:YES encoding:NSUTF8StringEncoding error:&bootstrapError]) {
-+            NSLog(@"DesktopToolkit bootstrap write failed: %@", bootstrapError);
++            NSLog(@"Nivlet bootstrap write failed: %@", bootstrapError);
 +            abort();
 +        }
  
@@ -185,26 +245,54 @@ index 1f0d2fb..a05174d 100644
                           HSAppleScriptEnabledKey: @NO,
                           HSOpenConsoleOnDockClickKey: @YES,
                           HSPreferencesDarkModeKey: @NO,
-diff --git a/extensions/webview/libwebview.m b/extensions/webview/libwebview.m
-index 9740d89..b14166d 100644
---- a/extensions/webview/libwebview.m
-+++ b/extensions/webview/libwebview.m
-@@ -88,7 +88,7 @@ void delayUntilViewStopsLoading(HSWebViewView *theView, dispatch_block_t block)
- 
-         // Configure the window
-         self.releasedWhenClosed = NO;
--        self.backgroundColor    = [NSColor clearColor];
-+        self.backgroundColor    = [NSColor windowBackgroundColor];
-         self.opaque             = YES;
-         self.hasShadow          = NO;
-         self.ignoresMouseEvents = NO;
-@@ -1264,6 +1264,9 @@ static int webview_transparent(lua_State *L) {
-         lua_pushboolean(L, !(BOOL)theWindow.opaque);
-     } else {
-         theWindow.opaque = !(lua_toboolean(L, 2));
-+        theWindow.backgroundColor = theWindow.opaque ? [NSColor windowBackgroundColor] : [NSColor clearColor];
-+        // Draw the titlebar over the opaque window color instead of the system material.
-+        theWindow.titlebarAppearsTransparent = theWindow.opaque;
-         [theWindow.contentView setValue:@(lua_toboolean(L, 2)) forKey:@"drawsTransparentBackground"];
-         lua_settop(L, 1) ;
+@@ -353,7 +375,7 @@
+     @try {
+         [[NSApplication sharedApplication] orderFrontStandardAboutPanel: nil];
+     } @catch (NSException *exception) {
+-        [LuaSkin logError:@"Unable to open About dialog. This may mean your Hammerspoon installation is corrupt. Please re-install it!"];
++        [LuaSkin logError:@"Unable to open About dialog. This may mean your Nivlet installation is corrupt. Please re-install it!"];
      }
+ }
+ 
+diff --git a/Hammerspoon/MJLua.m b/Hammerspoon/MJLua.m
+index 4c3e3ed..14c8dbf 100644
+--- a/Hammerspoon/MJLua.m
++++ b/Hammerspoon/MJLua.m
+@@ -912,8 +912,8 @@ void MJLuaInit(void) {
+         HSNSLOG(@"Unable to load setup.lua from bundle. Terminating");
+         NSAlert *alert = [[NSAlert alloc] init];
+         [alert addButtonWithTitle:@"OK"];
+-        [alert setMessageText:@"Hammerspoon installation is corrupted"];
+-        [alert setInformativeText:@"Please re-install Hammerspoon"];
++        [alert setMessageText:@"Nivlet installation is corrupted"];
++        [alert setInformativeText:@"Please re-install Nivlet"];
+         [alert setAlertStyle:NSAlertStyleCritical];
+         [alert runModal];
+         [[NSApplication sharedApplication] terminate: nil];
+@@ -934,7 +934,7 @@ void MJLuaInit(void) {
+         HSNSLOG(@"Error running setup.lua:%@", errorMessage);
+         NSAlert *alert = [[NSAlert alloc] init];
+         [alert addButtonWithTitle:@"OK"];
+-        [alert setMessageText:@"Hammerspoon initialization failed"];
++        [alert setMessageText:@"Nivlet initialization failed"];
+         [alert setInformativeText:errorMessage];
+         [alert setAlertStyle:NSAlertStyleCritical];
+         [alert runModal];
+@@ -1054,10 +1054,17 @@ void callDockIconCallback(void) {
+ 
+ // Shutdown Callback
+ static int callShutdownCallback(lua_State *L) {
++    if (L == NULL) return 0;
+     LuaSkin *skin = [LuaSkin sharedWithState:L];
+     _lua_stackguard_entry(skin.L);
+ 
+     lua_getglobal(L, "hs");
++    // A duplicate instance can exit before the hs global has been initialized.
++    if (!lua_istable(L, -1)) {
++        lua_pop(L, 1);
++        _lua_stackguard_exit(skin.L);
++        return 0;
++    }
+     lua_getfield(L, -1, "shutdownCallback");
+ 
+     if (lua_type(L, -1) == LUA_TNIL) {

@@ -1,6 +1,6 @@
 package.path='Toolkit/?.lua;'..package.path
 local now,count,image,writes,keys,stored=1000,0,nil,0,0,{}
-local directory='/private/tmp/DesktopToolkit-test-images'
+local directory='/private/tmp/Nivlet-test-images'
 os.execute('mkdir -p '..directory)
 local variant=0
 local imageMock={size=function() return {w=20,h=10} end,encodeAsURLString=function() return 'data:image/png;base64,fixture'..variant end}

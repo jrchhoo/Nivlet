@@ -115,7 +115,7 @@ function M.start(openSettings)
         local c=cpu.overall
         M.cpuPrevious={active=c.user+c.nice+c.system,total=c.user+c.nice+c.system+c.idle}
     end
-    M.menu=hs.menubar.new():setTitle("▲ — / ▼ —"):setTooltip("DesktopToolkit 系统信息")
+    M.menu=hs.menubar.new():setTitle("▲ — / ▼ —"):setTooltip("Nivlet 系统信息")
     M.menu:setMenu(M.menuItems)
     M.draw();M.scan();M.timer=hs.timer.doEvery(2,M.scan)
 end

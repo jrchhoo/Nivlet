@@ -35,3 +35,8 @@ menu=m.menuItems();menu[#menu].fn();assert(#m.entries==1)
 hs.dialog.blockAlert=function() return "清空" end
 menu[#menu].fn();assert(#m.entries==0)
 print('Menu clear cancellation and confirmed history removal passed')
+
+m.entries={{id=999,kind='image',time=now+0.25}}
+menu=m.menuItems();assert(menu[5].title:match('^图片 %d%d:%d%d:%d%d$'))
+m.entries={}
+print('Fractional image timestamps render in the clipboard menu')

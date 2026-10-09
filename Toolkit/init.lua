@@ -79,7 +79,7 @@ function app.save(value)
     local config, message = preferences.validate(value)
     if not config then return false, message end
     if popupConflicts(app.popupShortcut, config) then return false,"窗口快捷键与剪贴板菜单配置重复" end
-    if config.enabled and not hs.accessibilityState() then return false, "请先在系统设置开启 DesktopToolkit 的辅助功能权限" end
+    if config.enabled and not hs.accessibilityState() then return false, "请先在系统设置开启 Nivlet 的辅助功能权限" end
     clearBindings()
     local ok, errorMessage = install(config)
     if not ok then install(app.config); return false, errorMessage end
@@ -89,8 +89,8 @@ function app.save(value)
 end
 local ok, message = install(app.config)
 if not ok then hs.alert.show(message) end
-local function reply(ok, message)
-    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,config=app.config,input=input.config,sources=input.sources(),clipboard=clipboard.snapshot(),popupShortcut=app.popupShortcut or false,system=system.config,browser=browser.config,browsers=browser.installed(),accessibility=hs.accessibilityState()}) .. ")") end
+local function reply(ok, message, action)
+    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,config=app.config,input=input.config,sources=input.sources(),clipboard=clipboard.snapshot(),popupShortcut=app.popupShortcut or false,system=system.config,browser=browser.config,browsers=browser.installed(),accessibility=hs.accessibilityState()}) .. ")") end
 end
 function app.openSettings(section, focus)
     section=type(section)=="string" and section or nil
@@ -103,26 +103,26 @@ function app.openSettings(section, focus)
         local body = event.body
         if type(body) ~= "table" then return end
         if body.action == "load" then
-            reply(true, "")
+            reply(true, "", "load")
             if app.settingsSection then app.settings:evaluateJavaScript("window.showSection(" .. hs.json.encode({app.settingsSection}) .. "[0])") end
             if app.settingsFocus then app.settings:evaluateJavaScript("document.getElementById("..hs.json.encode({app.settingsFocus}).."[0]).focus()") end
         end
-        if body.action == "save" then local success, result = app.save(body.config); reply(success, result) end
-        if body.action == "savePopup" then local success, result = app.savePopup(body.config); reply(success, result) end
-        if body.action == "saveBrowser" then local success, result = browser.save(body.config); reply(success, result) end
-        if body.action == "openBrowserURL" then local success, result = browser.open(body.url,body.sourceBundle); reply(success, result) end
-        if body.action == "testBrowserURL" then local selected, result = browser.resolve(body.url,body.sourceBundle); reply(selected~=nil,selected and "将打开："..selected or result) end
-        if body.action == "saveSystem" then local success, result = system.save(body.config); reply(success, result) end
-        if body.action == "saveInput" then local success, result = input.save(body.config); reply(success, result) end
-        if body.action == "saveClipboard" then local success, result = clipboard.save(body.config); reply(success, result) end
-        if body.action == "pauseClipboard" then local success, result = clipboard.pause(); reply(success, result) end
+        if body.action == "save" then local success, result = app.save(body.config); reply(success, result, body.action) end
+        if body.action == "savePopup" then local success, result = app.savePopup(body.config); reply(success, result, body.action) end
+        if body.action == "saveBrowser" then local success, result = browser.save(body.config); reply(success, result, body.action) end
+        if body.action == "openBrowserURL" then local success, result = browser.open(body.url,body.sourceBundle); reply(success, result, body.action) end
+        if body.action == "testBrowserURL" then local selected, result = browser.resolve(body.url,body.sourceBundle); reply(selected~=nil,selected and "将打开："..(function() for _,item in ipairs(browser.browsers) do if item.id==selected then return item.name end end return selected end)() or result) end
+        if body.action == "saveSystem" then local success, result = system.save(body.config); reply(success, result, body.action) end
+        if body.action == "saveInput" then local success, result = input.save(body.config); reply(success, result, body.action) end
+        if body.action == "saveClipboard" then local success, result = clipboard.save(body.config); reply(success, result, body.action) end
+        if body.action == "pauseClipboard" then local success, result = clipboard.pause(); reply(success, result, body.action) end
         if body.action == "refreshClipboard" then reply(true, "") end
         if body.action == "previewClipboard" then
             local value, result = clipboard.preview(body.id)
             if value then app.settings:evaluateJavaScript("window.showImage("..hs.json.encode(value)..")") else reply(false,result) end
         end
-        if body.action == "copyClipboard" then local success, result = clipboard.copy(body.id); reply(success, result) end
-        if body.action == "clearClipboard" then local success, result = clipboard.clear(); reply(success, result) end
+        if body.action == "copyClipboard" then local success, result = clipboard.copy(body.id); reply(success, result, body.action) end
+        if body.action == "clearClipboard" then local success, result = clipboard.clear(); reply(success, result, body.action) end
         if body.action == "chooseApp" or body.action == "chooseBrowserApp" then
             local prompt=body.action=="chooseBrowserApp" and "选择链接来源应用" or "选择要配置输入法的应用"
             local paths = hs.dialog.chooseFileOrFolder(prompt, "/Applications", true, false, false, {"app"}, true)
@@ -141,7 +141,7 @@ function app.openSettings(section, focus)
     local file = assert(io.open(root .. "settings.html", "r"))
     local html = file:read("*a"); file:close()
     app.settings = hs.webview.new({x=180,y=160,w=980,h=720}, {}, app.controller)
-        :windowStyle({"titled","closable","resizable"}):windowTitle("DesktopToolkit 设置")
+        :windowStyle({"titled","closable","resizable"}):windowTitle("Nivlet 设置")
         :transparent(false):allowTextEntry(true):html(html):show():bringToFront(true)
 end
 clipboard.startMenu(function(mode)
@@ -155,6 +155,7 @@ else
     if not installed then hs.alert.show(errorMessage) end
 end
 system.start(function() app.openSettings("systemSection") end)
-app.menu = hs.menubar.new():setTitle("DT"):setTooltip("DesktopToolkit")
-app.menu:setMenu({{title="设置…",fn=app.openSettings},{title="退出 DesktopToolkit",fn=function() os.exit() end}})
-print("DesktopToolkit ready", hs.configdir, hs.settings.bundleID, "bindings", #app.bindings)
+app.menu = hs.menubar.new():setTitle(""):setTooltip("Nivlet 设置")
+if hs.image then app.menu:setIcon(hs.image.imageFromName("NSActionTemplate")) end
+app.menu:setMenu({{title="设置…",fn=app.openSettings},{title="退出 Nivlet",fn=function() os.exit() end}})
+print("Nivlet ready", hs.configdir, hs.settings.bundleID, "bindings", #app.bindings)

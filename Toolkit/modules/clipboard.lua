@@ -151,7 +151,7 @@ function M.copy(id,target)
     M.prune()
     for _,entry in ipairs(M.entries) do
         if entry.id==id then
-            if target and not hs.accessibilityState() then return false,"直接粘贴需要 DesktopToolkit 辅助功能权限" end
+            if target and not hs.accessibilityState() then return false,"直接粘贴需要 Nivlet 辅助功能权限" end
             local ok
             if entry.kind=="image" then ok=hs.pasteboard.writeObjects(entry.image) else ok=hs.pasteboard.setContents(entry.text) end
             if not ok then return false,"复制失败" end
@@ -192,7 +192,7 @@ function M.menuItems()
         {title="-"},
     }
     for _,entry in ipairs(M.entries) do
-        local text=(entry.text or "图片 "..os.date("%H:%M:%S",entry.time)):gsub("[\r\n\t]"," ")
+        local text=(entry.text or "图片 "..os.date("%H:%M:%S",math.floor(entry.time))):gsub("[\r\n\t]"," ")
         local length=utf8.len(text)
         if length and length>40 then text=text:sub(1,utf8.offset(text,41)-1).."…" end
         table.insert(menu,{title=text,image=entry.thumb,fn=function(mods) local ok,message=M.copy(entry.id,mods and mods.alt and target or nil);if not ok then hs.alert.show(message) end end})
@@ -215,7 +215,7 @@ function M.showPopup()
 end
 function M.startMenu(openSettings)
     M.openSettings=openSettings
-    M.menu=hs.menubar.new():setTitle("📋"):setTooltip("DesktopToolkit 剪贴板历史")
+    M.menu=hs.menubar.new():setTitle("📋"):setTooltip("Nivlet 剪贴板历史")
     M.menu:setMenu(M.menuItems)
     M.popup=hs.menubar.new(false):setMenu(M.menuItems)
 end

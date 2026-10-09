@@ -12,4 +12,5 @@ test "$(git -C "$upstream_dir" rev-parse HEAD)" = 1469832361b4c3687ec7d589c1b4ef
 git -C "$upstream_dir" apply --check "$project_dir/patches/runtime-isolation.patch"
 git -C "$upstream_dir" apply "$project_dir/patches/runtime-isolation.patch"
 git -C "$upstream_dir" apply "$project_dir/patches/xcode-compatibility.patch"
+git -C "$upstream_dir" apply "$project_dir/patches/branding.patch"
 cp "$project_dir/Hammerspoon-Downstream.xcconfig" "$upstream_dir/Hammerspoon-Downstream.xcconfig"

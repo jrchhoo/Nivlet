@@ -32,7 +32,7 @@ function M.apply(application)
         if rule.bundleID == id then
             if hs.keycodes.currentSourceID() == rule.sourceID then return true end
             local ok = hs.keycodes.currentSourceID(rule.sourceID)
-            if not ok then print("DesktopToolkit input source unavailable", rule.sourceID) end
+            if not ok then print("Nivlet input source unavailable", rule.sourceID) end
             return ok
         end
     end

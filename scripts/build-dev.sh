@@ -5,7 +5,7 @@ sh "$project_dir/scripts/preflight.sh"
 upstream_dir="$project_dir/vendor/hammerspoon"
 cd "$upstream_dir"
 xcodebuild -workspace Hammerspoon.xcworkspace -scheme Hammerspoon -configuration Debug -derivedDataPath "$project_dir/build/DerivedData" CODE_SIGNING_ALLOWED=NO CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER=NO build
-app_path="$project_dir/build/DerivedData/Build/Products/Debug/DesktopToolkit.app"
+app_path="$project_dir/build/DerivedData/Build/Products/Debug/Nivlet.app"
 test -d "$app_path"
 /usr/libexec/PlistBuddy -c Print:CFBundleIdentifier "$app_path/Contents/Info.plist" | /usr/bin/grep -qx dev.local.DesktopToolkit
 mkdir -p "$app_path/Contents/Resources/Toolkit"
