@@ -8,6 +8,9 @@ local windows = require("modules.windows")
 local input = require("modules.input_method")
 input.start()
 local clipboard = require("modules.clipboard")
+local system = require("modules.sys_info")
+local browser = require("modules.browser")
+browser.start()
 clipboard.start()
 local app = {bindings={}}
 _G.desktopToolkit = app
@@ -87,12 +90,13 @@ end
 local ok, message = install(app.config)
 if not ok then hs.alert.show(message) end
 local function reply(ok, message)
-    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,config=app.config,input=input.config,sources=input.sources(),clipboard=clipboard.snapshot(),popupShortcut=app.popupShortcut or false,accessibility=hs.accessibilityState()}) .. ")") end
+    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,config=app.config,input=input.config,sources=input.sources(),clipboard=clipboard.snapshot(),popupShortcut=app.popupShortcut or false,system=system.config,browser=browser.config,browsers=browser.installed(),accessibility=hs.accessibilityState()}) .. ")") end
 end
-function app.openSettings(section)
+function app.openSettings(section, focus)
     section=type(section)=="string" and section or nil
     app.settingsSection=section
-    if app.settings then app.settings:show():bringToFront(true); reply(true, ""); if section then app.settings:evaluateJavaScript("window.showSection(" .. hs.json.encode({section}) .. "[0])") end; return end
+    app.settingsFocus=focus
+    if app.settings then app.settings:show():bringToFront(true); reply(true, ""); if section then app.settings:evaluateJavaScript("window.showSection(" .. hs.json.encode({section}) .. "[0])") end; if focus then app.settings:evaluateJavaScript("document.getElementById("..hs.json.encode({focus}).."[0]).focus()") end; return end
     app.controller = hs.webview.usercontent.new("toolkit")
     app.controller:setCallback(function(event)
         local body = event.body
@@ -100,43 +104,56 @@ function app.openSettings(section)
         if body.action == "load" then
             reply(true, "")
             if app.settingsSection then app.settings:evaluateJavaScript("window.showSection(" .. hs.json.encode({app.settingsSection}) .. "[0])") end
+            if app.settingsFocus then app.settings:evaluateJavaScript("document.getElementById("..hs.json.encode({app.settingsFocus}).."[0]).focus()") end
         end
         if body.action == "save" then local success, result = app.save(body.config); reply(success, result) end
         if body.action == "savePopup" then local success, result = app.savePopup(body.config); reply(success, result) end
+        if body.action == "saveBrowser" then local success, result = browser.save(body.config); reply(success, result) end
+        if body.action == "openBrowserURL" then local success, result = browser.open(body.url,body.sourceBundle); reply(success, result) end
+        if body.action == "testBrowserURL" then local selected, result = browser.resolve(body.url,body.sourceBundle); reply(selected~=nil,selected and "将打开："..selected or result) end
+        if body.action == "saveSystem" then local success, result = system.save(body.config); reply(success, result) end
         if body.action == "saveInput" then local success, result = input.save(body.config); reply(success, result) end
         if body.action == "saveClipboard" then local success, result = clipboard.save(body.config); reply(success, result) end
         if body.action == "pauseClipboard" then local success, result = clipboard.pause(); reply(success, result) end
         if body.action == "refreshClipboard" then reply(true, "") end
+        if body.action == "previewClipboard" then
+            local value, result = clipboard.preview(body.id)
+            if value then app.settings:evaluateJavaScript("window.showImage("..hs.json.encode(value)..")") else reply(false,result) end
+        end
         if body.action == "copyClipboard" then local success, result = clipboard.copy(body.id); reply(success, result) end
         if body.action == "clearClipboard" then local success, result = clipboard.clear(); reply(success, result) end
-        if body.action == "chooseApp" then
-            local paths = hs.dialog.chooseFileOrFolder("选择要配置输入法的应用", "/Applications", true, false, false, {"app"}, true)
+        if body.action == "chooseApp" or body.action == "chooseBrowserApp" then
+            local prompt=body.action=="chooseBrowserApp" and "选择链接来源应用" or "选择要配置输入法的应用"
+            local paths = hs.dialog.chooseFileOrFolder(prompt, "/Applications", true, false, false, {"app"}, true)
             local path = paths
             if type(paths)=="table" then path=paths[1] or paths["1"] end
             if type(path)=="string" and path ~= "" then
                 local info = hs.application.infoForBundlePath(path)
                 if info and info.CFBundleIdentifier then
                     local value = {bundleID=info.CFBundleIdentifier,name=info.CFBundleDisplayName or info.CFBundleName or info.CFBundleIdentifier}
-                    app.settings:evaluateJavaScript("window.addInputRule(" .. hs.json.encode(value) .. ")")
+                    local callback=body.action=="chooseBrowserApp" and "window.addBrowserAppRule(" or "window.addInputRule("
+                    app.settings:evaluateJavaScript(callback .. hs.json.encode(value) .. ")")
                 else reply(false, "无法识别所选应用") end
             end
         end
     end)
     local file = assert(io.open(root .. "settings.html", "r"))
     local html = file:read("*a"); file:close()
-    app.settings = hs.webview.new({x=180,y=160,w=800,h=720}, {}, app.controller)
+    app.settings = hs.webview.new({x=180,y=160,w=980,h=720}, {}, app.controller)
         :windowStyle({"titled","closable","resizable"}):windowTitle("DesktopToolkit 设置")
         :transparent(false):allowTextEntry(true):html(html):show():bringToFront(true)
 end
-clipboard.startMenu(function() app.openSettings("clipSection") end)
+clipboard.startMenu(function(mode)
+    local id=mode=="settings" and "clipEnabled" or "clipSearch"
+    app.openSettings("clipSection",id)
+end)
 if popupConflicts(app.popupShortcut, app.config) then
     hs.alert.show("剪贴板菜单快捷键与窗口配置冲突，未启用菜单绑定")
 else
     local installed, errorMessage = installPopup(app.popupShortcut)
     if not installed then hs.alert.show(errorMessage) end
 end
-local system = require("modules.sys_info")
-system.start()
+system.start(function() app.openSettings("systemSection") end)
 app.menu = hs.menubar.new():setTitle("DT"):setTooltip("DesktopToolkit")
 app.menu:setMenu({{title="设置…",fn=app.openSettings},{title="退出 DesktopToolkit",fn=function() os.exit() end}})
 print("DesktopToolkit ready", hs.configdir, hs.settings.bundleID, "bindings", #app.bindings)

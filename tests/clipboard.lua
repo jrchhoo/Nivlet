@@ -27,3 +27,11 @@ print('Clipboard bounds, deduplication, expiry, exclusion, privacy markers, paus
 
 config.enabled=true;assert(m.save(config));copy(string.rep('测试',30));local menu=m.menuItems();assert(utf8.len(menu[5].title)==41);menu[5].fn();assert(text==string.rep('测试',30));config.enabled=false;assert(m.save(config))
 print('Menu Unicode labels and selection callback passed')
+
+local clears=0
+hs.dialog={blockAlert=function() return "取消" end}
+config.enabled=true;assert(m.save(config));copy('clear-menu-fixture')
+menu=m.menuItems();menu[#menu].fn();assert(#m.entries==1)
+hs.dialog.blockAlert=function() return "清空" end
+menu[#menu].fn();assert(#m.entries==0)
+print('Menu clear cancellation and confirmed history removal passed')

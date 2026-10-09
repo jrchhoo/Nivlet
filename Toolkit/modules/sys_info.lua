@@ -1,4 +1,24 @@
 local M={rx=0,tx=0,lunar="N/A",mac=nil}
+local settingsKey="desktoptoolkit.system.v1"
+M.fields={"network","cpu","memory","disk","ipv4","ipv6","mac","date","lunar"}
+function M.defaults()
+    local config={};for _,field in ipairs(M.fields) do config[field]=true end;return config
+end
+function M.validate(value)
+    if type(value)~="table" then return nil,"系统信息设置格式无效" end
+    local config={}
+    for _,field in ipairs(M.fields) do
+        if type(value[field])~="boolean" then return nil,"系统信息开关格式无效" end
+        config[field]=value[field]
+    end
+    return config
+end
+M.config=M.defaults()
+function M.save(value)
+    local config,message=M.validate(value);if not config then return false,message end
+    M.config=config;hs.settings.set(settingsKey,config);M.draw()
+    return true,"系统信息设置已保存"
+end
 function M.speed(bytes)
     if bytes<1024 then return string.format("%.0f B/s",bytes) end
     if bytes<1048576 then return string.format("%.1f KB/s",bytes/1024) end
@@ -53,9 +73,19 @@ function M.menuItems()
     local weekdays={"周日","周一","周二","周三","周四","周五","周六"}
     table.insert(menu,{title="Date: "..os.date("%Y-%m-%d").." "..weekdays[os.date("*t").wday],fn=function() hs.pasteboard.setContents(os.date("%Y-%m-%d %H:%M:%S")) end})
     table.insert(menu,copyItem("Lunar",M.lunar))
-    return menu
+    local prefixes={CPU="cpu",MEM="memory",Disk="disk",LAN="ipv4",IPv6="ipv6",MAC="mac",Date="date",Lunar="lunar"}
+    local filtered={}
+    for _,item in ipairs(menu) do
+        local field=prefixes[item.title:match("^(%w+):")]
+        if field and M.config[field] then table.insert(filtered,item) end
+    end
+    if #filtered==0 then table.insert(filtered,{title="未选择显示信息",disabled=true}) end
+    table.insert(filtered,{title="-"})
+    table.insert(filtered,{title="系统信息设置…",fn=M.openSettings})
+    return filtered
 end
 function M.draw()
+    if not M.config.network then M.menu:setIcon(nil):setTitle("ⓘ");return end
     local text="▲ "..M.speed(M.tx).."\n▼ "..M.speed(M.rx)
     local canvas=hs.canvas.new({x=0,y=0,w=90,h=22})
     canvas:appendElements({type="text",text=text,textSize=9,textColor={white=0},frame={x=0,y=0,w=90,h=22}})
@@ -77,7 +107,9 @@ function M.scan()
     end)
     if M.task then M.task:start() end
 end
-function M.start()
+function M.start(openSettings)
+    M.openSettings=openSettings
+    M.config=M.validate(hs.settings.get(settingsKey)) or M.defaults()
     local cpu=hs.host.cpuUsageTicks()
     if cpu and cpu.overall then
         local c=cpu.overall
@@ -85,6 +117,6 @@ function M.start()
     end
     M.menu=hs.menubar.new():setTitle("▲ — / ▼ —"):setTooltip("DesktopToolkit 系统信息")
     M.menu:setMenu(M.menuItems)
-    M.scan();M.timer=hs.timer.doEvery(2,M.scan)
+    M.draw();M.scan();M.timer=hs.timer.doEvery(2,M.scan)
 end
 return M

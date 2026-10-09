@@ -163,6 +163,17 @@ function M.copy(id,target)
     return false,"记录已过期或被清除"
 end
 function M.clear() for _,entry in ipairs(M.entries) do remove(entry) end;M.entries={};M.persist();return true,"历史已清空" end
+function M.preview(id)
+    M.prune()
+    for _,entry in ipairs(M.entries) do
+        if entry.id==id and entry.kind=="image" then
+            local url=entry.image:encodeAsURLString(true,"PNG")
+            if not url or #url>13981070 then return nil,"图片无法预览或超出容量限制" end
+            return {id=entry.id,time=entry.time,url=url}
+        end
+    end
+    return nil,"图片已过期或被清除"
+end
 function M.snapshot()
     M.prune()
     local entries={}
@@ -176,7 +187,7 @@ function M.menuItems()
     local target=hs.application.frontmostApplication()
     local menu={
         {title=M.config.enabled and (M.paused and "已暂停记录" or "正在记录") or "历史记录未启用",disabled=true},
-        {title="搜索历史 / 设置…",fn=M.openSettings},
+        {title="搜索历史…",fn=function() M.openSettings("history") end},
         {title=M.paused and "恢复记录" or "暂停记录",disabled=not M.config.enabled,fn=function() M.pause() end},
         {title="-"},
     }
@@ -187,6 +198,11 @@ function M.menuItems()
         table.insert(menu,{title=text,image=entry.thumb,fn=function(mods) local ok,message=M.copy(entry.id,mods and mods.alt and target or nil);if not ok then hs.alert.show(message) end end})
     end
     if #M.entries==0 then table.insert(menu,{title="暂无历史",disabled=true}) end
+    table.insert(menu,{title="-"})
+    table.insert(menu,{title="剪贴板设置…",fn=function() M.openSettings("settings") end})
+    table.insert(menu,{title="清空历史…",disabled=#M.entries==0,fn=function()
+        if hs.dialog.blockAlert("清空剪贴板历史？","仅移除此 App 的历史记录和缓存，不改系统当前剪贴板。","清空","取消","warning")=="清空" then M.clear() end
+    end})
     return menu
 end
 function M.start()
