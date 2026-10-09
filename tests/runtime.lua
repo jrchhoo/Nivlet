@@ -63,3 +63,18 @@ assert(desktopToolkit.save({enabled=false,shortcuts={right={key="L",mods={"ctrl"
 assert(not launcher.save({enabled=true,rules={{bundleID="com.example.probe",shortcut={key="L",mods={"ctrl"}}}}}))
 assert(callbacks["J"] and launcher.config.rules[1].shortcut.key=="J")
 print("Bidirectional launcher, window and clipboard shortcut conflicts passed")
+
+-- Import must release all three shortcut owners before moving a binding.
+hs.application={pathForBundleID=function() return "/Applications/Test.app" end}
+local manager=desktopToolkit.configuration
+local function document(modules) return {format="Nivlet",version=1,modules=modules} end
+assert(manager.apply(document({windows={enabled=true,shortcuts={left={key="J",mods={"ctrl"}}}},launcher={enabled=false,rules={}},popupShortcut=false})))
+assert(callbacks["J"] and not callbacks["K"] and #launcher.bindings==0)
+local before=stored["desktoptoolkit.preferences.v1"]
+local imported,message=manager.apply(document({windows={enabled=true,shortcuts={left={key="9",mods={"ctrl"}}}},popupShortcut=false,launcher={enabled=false,rules={}}}))
+assert(not imported and message:find("已恢复原配置",1,true))
+assert(callbacks["J"] and not callbacks["9"] and desktopToolkit.config.shortcuts.left.key=="J")
+assert(stored["desktoptoolkit.preferences.v1"]==before)
+assert(manager.apply(document({windows={enabled=false,shortcuts={}},popupShortcut={key="J",mods={"ctrl"}}})))
+assert(desktopToolkit.popupBinding and callbacks["J"] and #desktopToolkit.bindings==0)
+print("Actual runtime import swaps shortcut owners and restores bindings plus saved configuration after registration failure")
