@@ -56,8 +56,12 @@ function M.menuItems()
     return menu
 end
 function M.draw()
+    local text="▲ "..M.speed(M.tx).."\n▼ "..M.speed(M.rx)
     local canvas=hs.canvas.new({x=0,y=0,w=90,h=22})
-    canvas:appendElements({type="text",text="▲ "..M.speed(M.tx).."\n▼ "..M.speed(M.rx),textSize=9,textColor={white=0},frame={x=0,y=0,w=90,h=22}})
+    canvas:appendElements({type="text",text=text,textSize=9,textColor={white=0},frame={x=0,y=0,w=90,h=22}})
+    local width=math.ceil(canvas:minimumTextSize(1,text).w)+2
+    canvas:size({w=width,h=22})
+    canvas:elementAttribute(1,"frame",{x=0,y=0,w=width,h=22})
     M.menu:setTitle(""):setIcon(canvas:imageFromCanvas(),true)
     canvas:delete()
 end

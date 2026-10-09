@@ -7,8 +7,8 @@ M.accept({interfaces={en1={rx=9000,tx=9000}}},'en1',15);assert(M.rx==0)
 M.accept({interfaces={en1={rx=10,tx=10}}},'en1',17);assert(M.rx==0 and M.tx==0)
 M.accept({interfaces={}},'en1',19);assert(M.previous==nil)
 print('Network elapsed sampling, interface changes, counter resets and speed units passed')
-local title,icon,deleted
+local title,icon,deleted,width,frame
 M.menu={setTitle=function(self,v) title=v;return self end,setIcon=function(self,v) icon=v;return self end}
-hs={canvas={new=function() return {appendElements=function() end,imageFromCanvas=function() return 'icon' end,delete=function() deleted=true end} end}}
-M.draw();assert(title=='' and icon=='icon' and deleted)
+hs={canvas={new=function() return {appendElements=function() end,minimumTextSize=function() return {w=41.2,h=22} end,size=function(_,v) width=v.w end,elementAttribute=function(_,i,k,v) assert(i==1 and k=='frame');frame=v end,imageFromCanvas=function() return 'icon' end,delete=function() deleted=true end} end}}
+M.draw();assert(title=='' and icon=='icon' and deleted and width==44 and frame.w==44)
 print('Menu icon replaces placeholder title and releases canvas passed')

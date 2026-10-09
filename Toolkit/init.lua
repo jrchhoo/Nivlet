@@ -92,14 +92,14 @@ end
 function app.openSettings(section)
     section=type(section)=="string" and section or nil
     app.settingsSection=section
-    if app.settings then app.settings:show():bringToFront(true); reply(true, ""); if section then app.settings:evaluateJavaScript("document.getElementById(" .. hs.json.encode({section}) .. "[0]).scrollIntoView()") end; return end
+    if app.settings then app.settings:show():bringToFront(true); reply(true, ""); if section then app.settings:evaluateJavaScript("window.showSection(" .. hs.json.encode({section}) .. "[0])") end; return end
     app.controller = hs.webview.usercontent.new("toolkit")
     app.controller:setCallback(function(event)
         local body = event.body
         if type(body) ~= "table" then return end
         if body.action == "load" then
             reply(true, "")
-            if app.settingsSection then app.settings:evaluateJavaScript("document.getElementById(" .. hs.json.encode({app.settingsSection}) .. "[0]).scrollIntoView()") end
+            if app.settingsSection then app.settings:evaluateJavaScript("window.showSection(" .. hs.json.encode({app.settingsSection}) .. "[0])") end
         end
         if body.action == "save" then local success, result = app.save(body.config); reply(success, result) end
         if body.action == "savePopup" then local success, result = app.savePopup(body.config); reply(success, result) end
@@ -124,9 +124,9 @@ function app.openSettings(section)
     end)
     local file = assert(io.open(root .. "settings.html", "r"))
     local html = file:read("*a"); file:close()
-    app.settings = hs.webview.new({x=180,y=160,w=720,h=580}, {}, app.controller)
+    app.settings = hs.webview.new({x=180,y=160,w=800,h=720}, {}, app.controller)
         :windowStyle({"titled","closable","resizable"}):windowTitle("DesktopToolkit 设置")
-        :allowTextEntry(true):html(html):show():bringToFront(true)
+        :transparent(false):allowTextEntry(true):html(html):show():bringToFront(true)
 end
 clipboard.startMenu(function() app.openSettings("clipSection") end)
 if popupConflicts(app.popupShortcut, app.config) then
