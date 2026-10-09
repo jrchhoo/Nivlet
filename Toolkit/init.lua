@@ -13,6 +13,7 @@ local system = require("modules.sys_info")
 local browser = require("modules.browser")
 browser.start()
 clipboard.start()
+local launcher=require("modules.launcher")
 local app = {bindings={}}
 local generalKey = "desktoptoolkit.general.v1"
 local function validateGeneral(value)
@@ -73,6 +74,7 @@ end
 function app.savePopup(value)
     local shortcut, message = normalizePopup(value)
     if message then return false,message end
+    if launcher.conflicts(shortcut) then return false,i18n.t("快捷键与应用启动配置重复") end
     if popupConflicts(shortcut, app.config) then return false,i18n.t("剪贴板快捷键与窗口管理配置重复") end
     if not (sameShortcut(shortcut, app.popupShortcut) and app.popupBinding) then
         local success, result = installPopup(shortcut)
@@ -108,6 +110,7 @@ end
 function app.save(value)
     local config, message = preferences.validate(value)
     if not config then return false, message end
+    for _,shortcut in pairs(config.shortcuts) do if launcher.conflicts(shortcut) then return false,i18n.t("快捷键与应用启动配置重复") end end
     if popupConflicts(app.popupShortcut, config) then return false,i18n.t("窗口快捷键与剪贴板菜单配置重复") end
     if config.enabled and not hs.accessibilityState() then return false, i18n.t("请先在系统设置开启 Nivlet 的辅助功能权限") end
     clearBindings()
@@ -120,7 +123,7 @@ end
 local ok, message = install(app.config)
 if not ok then hs.alert.show(message) end
 local function reply(ok, message, action)
-    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,language=i18n.language(),translations=i18n.dictionary,general=app.general,config=app.config,input=input.config,sources=input.sources(),clipboard=clipboard.snapshot(),popupShortcut=app.popupShortcut or false,system=system.config,browser=browser.config,browsers=browser.installed(),accessibility=hs.accessibilityState()}) .. ")") end
+    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,language=i18n.language(),translations=i18n.dictionary,general=app.general,launcher=launcher.config,config=app.config,input=input.config,sources=input.sources(),clipboard=clipboard.snapshot(),popupShortcut=app.popupShortcut or false,system=system.config,browser=browser.config,browsers=browser.installed(),accessibility=hs.accessibilityState()}) .. ")") end
 end
 function app.openSettings(section, focus)
     section=type(section)=="string" and section or nil
@@ -137,6 +140,7 @@ function app.openSettings(section, focus)
             if app.settingsSection then app.settings:evaluateJavaScript("window.showSection(" .. hs.json.encode({app.settingsSection}) .. "[0])") end
             if app.settingsFocus then app.settings:evaluateJavaScript("document.getElementById("..hs.json.encode({app.settingsFocus}).."[0]).focus()") end
         end
+        if body.action == "saveLauncher" then local success,result=launcher.save(body.config);reply(success,result,body.action) end
         if body.action == "saveGeneral" then local success, result = app.saveGeneral(body.config); reply(success, result, body.action) end
         if body.action == "save" then local success, result = app.save(body.config); reply(success, result, body.action) end
         if body.action == "savePopup" then local success, result = app.savePopup(body.config); reply(success, result, body.action) end
@@ -154,8 +158,8 @@ function app.openSettings(section, focus)
         end
         if body.action == "copyClipboard" then local success, result = clipboard.copy(body.id); reply(success, result, body.action) end
         if body.action == "clearClipboard" then local success, result = clipboard.clear(); reply(success, result, body.action) end
-        if body.action == "chooseApp" or body.action == "chooseBrowserApp" then
-            local prompt=body.action=="chooseBrowserApp" and i18n.t("选择链接来源应用") or i18n.t("选择要配置输入法的应用")
+        if body.action == "chooseApp" or body.action == "chooseBrowserApp" or body.action == "chooseLauncherApp" then
+            local prompt=body.action=="chooseLauncherApp" and i18n.t("选择要启动的应用") or body.action=="chooseBrowserApp" and i18n.t("选择链接来源应用") or i18n.t("选择要配置输入法的应用")
             local paths = hs.dialog.chooseFileOrFolder(prompt, "/Applications", true, false, false, {"app"}, true)
             local path = paths
             if type(paths)=="table" then path=paths[1] or paths["1"] end
@@ -163,7 +167,7 @@ function app.openSettings(section, focus)
                 local info = hs.application.infoForBundlePath(path)
                 if info and info.CFBundleIdentifier then
                     local value = {bundleID=info.CFBundleIdentifier,name=info.CFBundleDisplayName or info.CFBundleName or info.CFBundleIdentifier}
-                    local callback=body.action=="chooseBrowserApp" and "window.addBrowserAppRule(" or "window.addInputRule("
+                    local callback=body.action=="chooseLauncherApp" and "window.addLauncherRule(" or body.action=="chooseBrowserApp" and "window.addBrowserAppRule(" or "window.addInputRule("
                     app.settings:evaluateJavaScript(callback .. hs.json.encode(value) .. ")")
                 else reply(false, i18n.t("无法识别所选应用")) end
             end
@@ -185,6 +189,7 @@ else
     local installed, errorMessage = installPopup(app.popupShortcut)
     if not installed then hs.alert.show(errorMessage) end
 end
+launcher.start(function(shortcut) return sameShortcut(shortcut,app.popupShortcut) or (shortcut and popupConflicts(shortcut,app.config)) end)
 system.start(function() app.openSettings("systemSection") end)
 app.menu = hs.menubar.new():setTitle(""):setTooltip(i18n.t("Nivlet 设置"))
 if hs.image then app.menu:setIcon(hs.image.imageFromName("NSActionTemplate")) end

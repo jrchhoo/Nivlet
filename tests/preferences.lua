@@ -10,3 +10,10 @@ local w = require("modules.windows")
 local right = w.frame("right", {x=-1920,y=40,w=1920,h=1040})
 assert(right.x == -960 and right.y == 40 and right.w == 960 and right.h == 1040)
 print("Preferences validation and negative-coordinate window geometry passed")
+
+for input,expected in pairs({left="left",RIGHT="right",ArrowUp="up",["↓"]="down"}) do
+    local cfg=assert(p.validate({enabled=true,shortcuts={left={key=input,mods={"ctrl","alt"}}}}))
+    assert(cfg.shortcuts.left.key==expected)
+end
+assert(not p.validate({enabled=true,shortcuts={left={key="ArrowLeft",mods={"ctrl"}},right={key="←",mods={"ctrl"}}}}))
+print("Arrow keys normalize to Runtime key names and duplicate aliases are rejected")

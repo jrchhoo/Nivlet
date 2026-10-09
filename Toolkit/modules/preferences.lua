@@ -10,9 +10,10 @@ function M.validate(value)
         local item = value.shortcuts[action]
         if item then
             if type(item) ~= "table" or type(item.key) ~= "string" or type(item.mods) ~= "table" then return nil, i18n.t("快捷键格式无效") end
-            local key = item.key:upper()
+            local arrows={LEFT="left",RIGHT="right",UP="up",DOWN="down",ARROWLEFT="left",ARROWRIGHT="right",ARROWUP="up",ARROWDOWN="down",["←"]="left",["→"]="right",["↑"]="up",["↓"]="down"}
+            local key = arrows[item.key:upper()] or item.key:upper()
             if key ~= "" then
-                if not key:match("^[A-Z0-9]$") then return nil, i18n.t("第一版快捷键支持字母或数字") end
+                if not key:match("^[A-Z0-9]$") and key~="left" and key~="right" and key~="up" and key~="down" then return nil, i18n.t("快捷键支持字母、数字或方向键") end
                 local flags = {}
                 for _, mod in ipairs(item.mods) do
                     if mod ~= "ctrl" and mod ~= "alt" and mod ~= "cmd" and mod ~= "shift" then return nil, i18n.t("未知修饰键") end
