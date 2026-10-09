@@ -80,7 +80,7 @@ function M.load()
                 local attr=hs.fs.symlinkAttributes(entry.path)
                 if attr and attr.mode=="file" and attr.size<=10485760 then
                     local image=hs.image.imageFromPath(entry.path)
-                    if image then item={id=entry.id,time=entry.time,kind="image",image=image,path=entry.path,thumb=thumbnail(image)} end
+                    if image then item={id=entry.id,time=entry.time,kind="image",image=image,path=entry.path,thumb=thumbnail(image),fingerprint=hs.hash.SHA256(image:encodeAsURLString(true,"PNG"))} end
                 end
             end
             if item then M.nextID=math.max(M.nextID,item.id);table.insert(M.entries,item) end
@@ -100,21 +100,25 @@ function M.poll()
     for _,id in ipairs(M.config.excluded) do if bundle==id then return end end
     for _,kind in ipairs(hs.pasteboard.contentTypes() or {}) do if ignored[kind] then return end end
     local image=M.config.images and hs.pasteboard.readImage() or nil
-    local value,thumb
+    local value,thumb,fingerprint
     if image then
         local size=image:size()
         if size.w<=0 or size.h<=0 or size.w*size.h>25000000 then return end
         local encoded=image:encodeAsURLString(true,"PNG")
         if not encoded or #encoded>13981070 then return end -- 10 MiB PNG, including base64 expansion.
+        fingerprint=hs.hash.SHA256(encoded)
         thumb=thumbnail(image)
     else
         value=hs.pasteboard.getContents()
         if type(value)~="string" or value=="" or #value>65536 then return end
     end
     if hs.pasteboard.changeCount()~=count then return end
-    if value then for i=#M.entries,1,-1 do if M.entries[i].text==value then remove(M.entries[i]);table.remove(M.entries,i) end end end
+    for i=#M.entries,1,-1 do
+        local entry=M.entries[i]
+        if value and entry.text==value or fingerprint and entry.fingerprint==fingerprint then remove(entry);table.remove(M.entries,i) end
+    end
     M.nextID=M.nextID+1
-    table.insert(M.entries,1,{id=M.nextID,kind=image and "image" or "text",text=value,image=image,thumb=thumb,time=hs.timer.secondsSinceEpoch()})
+    table.insert(M.entries,1,{id=M.nextID,kind=image and "image" or "text",text=value,image=image,thumb=thumb,fingerprint=fingerprint,time=hs.timer.secondsSinceEpoch()})
     M.prune()
     local ok,message=M.persist();if not ok then hs.alert.show(message) end
 end
@@ -190,9 +194,13 @@ function M.start()
     if config.enabled and config.persistent and not ensureDirectory() then config.persistent=false end
     M.configure(config);M.load()
 end
+function M.showPopup()
+    if M.popup then M.popup:popupMenu(hs.mouse.absolutePosition()) end
+end
 function M.startMenu(openSettings)
     M.openSettings=openSettings
     M.menu=hs.menubar.new():setTitle("📋"):setTooltip("DesktopToolkit 剪贴板历史")
     M.menu:setMenu(M.menuItems)
+    M.popup=hs.menubar.new(false):setMenu(M.menuItems)
 end
 return M

@@ -13,6 +13,45 @@ local app = {bindings={}}
 _G.desktopToolkit = app
 local key = "desktoptoolkit.preferences.v1"
 app.config = preferences.validate(hs.settings.get(key)) or preferences.defaults()
+local popupKey = "desktoptoolkit.clipboard.shortcut.v1"
+local function normalizePopup(value)
+    local config, message = preferences.validate({enabled=false,shortcuts={left=value}})
+    if not config then return nil, message end
+    return config.shortcuts.left
+end
+local function sameShortcut(a, b)
+    return a and b and a.key==b.key and table.concat(a.mods,"+")==table.concat(b.mods,"+")
+end
+local function popupConflicts(shortcut, config)
+    for _, action in ipairs(windows.actions) do
+        if sameShortcut(shortcut, config.shortcuts[action]) then return true end
+    end
+    return false
+end
+app.popupShortcut = normalizePopup(hs.settings.get(popupKey))
+local function installPopup(shortcut)
+    if app.popupBinding then app.popupBinding:delete();app.popupBinding=nil end
+    if not shortcut then return true end
+    if hs.hotkey.systemAssigned(shortcut.mods,shortcut.key) or not hs.hotkey.assignable(shortcut.mods,shortcut.key) then return false,"剪贴板快捷键被系统占用或无法注册" end
+    app.popupBinding = hs.hotkey.bind(shortcut.mods,shortcut.key,clipboard.showPopup)
+    if not app.popupBinding then return false,"剪贴板快捷键注册失败" end
+    return true
+end
+function app.savePopup(value)
+    local shortcut, message = normalizePopup(value)
+    if message then return false,message end
+    if popupConflicts(shortcut, app.config) then return false,"剪贴板快捷键与窗口管理配置重复" end
+    if not (sameShortcut(shortcut, app.popupShortcut) and app.popupBinding) then
+        local success, result = installPopup(shortcut)
+        if not success then
+            local restored = installPopup(app.popupShortcut)
+            return false, restored and result or result.."；旧快捷键也无法恢复，请重新配置"
+        end
+    end
+    app.popupShortcut=shortcut
+    if shortcut then hs.settings.set(popupKey,shortcut) else hs.settings.clear(popupKey) end
+    return true, shortcut and "剪贴板菜单快捷键已保存" or "剪贴板菜单快捷键已解除"
+end
 local function clearBindings()
     for _, binding in ipairs(app.bindings) do binding:delete() end
     app.bindings = {}
@@ -36,6 +75,7 @@ end
 function app.save(value)
     local config, message = preferences.validate(value)
     if not config then return false, message end
+    if popupConflicts(app.popupShortcut, config) then return false,"窗口快捷键与剪贴板菜单配置重复" end
     if config.enabled and not hs.accessibilityState() then return false, "请先在系统设置开启 DesktopToolkit 的辅助功能权限" end
     clearBindings()
     local ok, errorMessage = install(config)
@@ -47,7 +87,7 @@ end
 local ok, message = install(app.config)
 if not ok then hs.alert.show(message) end
 local function reply(ok, message)
-    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,config=app.config,input=input.config,sources=input.sources(),clipboard=clipboard.snapshot(),accessibility=hs.accessibilityState()}) .. ")") end
+    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,config=app.config,input=input.config,sources=input.sources(),clipboard=clipboard.snapshot(),popupShortcut=app.popupShortcut or false,accessibility=hs.accessibilityState()}) .. ")") end
 end
 function app.openSettings(section)
     section=type(section)=="string" and section or nil
@@ -62,6 +102,7 @@ function app.openSettings(section)
             if app.settingsSection then app.settings:evaluateJavaScript("document.getElementById(" .. hs.json.encode({app.settingsSection}) .. "[0]).scrollIntoView()") end
         end
         if body.action == "save" then local success, result = app.save(body.config); reply(success, result) end
+        if body.action == "savePopup" then local success, result = app.savePopup(body.config); reply(success, result) end
         if body.action == "saveInput" then local success, result = input.save(body.config); reply(success, result) end
         if body.action == "saveClipboard" then local success, result = clipboard.save(body.config); reply(success, result) end
         if body.action == "pauseClipboard" then local success, result = clipboard.pause(); reply(success, result) end
@@ -88,6 +129,12 @@ function app.openSettings(section)
         :allowTextEntry(true):html(html):show():bringToFront(true)
 end
 clipboard.startMenu(function() app.openSettings("clipSection") end)
+if popupConflicts(app.popupShortcut, app.config) then
+    hs.alert.show("剪贴板菜单快捷键与窗口配置冲突，未启用菜单绑定")
+else
+    local installed, errorMessage = installPopup(app.popupShortcut)
+    if not installed then hs.alert.show(errorMessage) end
+end
 local system = require("modules.sys_info")
 system.start()
 app.menu = hs.menubar.new():setTitle("DT"):setTooltip("DesktopToolkit")

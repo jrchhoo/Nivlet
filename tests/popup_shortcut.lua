@@ -1,0 +1,30 @@
+package.path="Toolkit/?.lua;"..package.path
+local stored, bindings, blocked, fail={}, {}, false, false
+local popped=0
+local function signature(mods,key) return table.concat(mods,'+')..'+'..key end
+local function menu() return {setTitle=function(self) return self end,setTooltip=function(self) return self end,setMenu=function(self,fn) self.items=fn;return self end,popupMenu=function(_,point) assert(point.x==-100 and point.y==20);popped=popped+1 end} end
+hs={processInfo={bundleID='dev.local.DesktopToolkit',bundlePath='.'},configdir='/isolated/toolkit',
+ settings={bundleID='dev.local.DesktopToolkit',get=function(k) return stored[k] end,set=function(k,v) stored[k]=v end,clear=function(k) stored[k]=nil end},
+ menubar={new=menu},mouse={absolutePosition=function() return {x=-100,y=20} end},alert={show=function() end},accessibilityState=function() return true end,
+ hotkey={systemAssigned=function(_,key) return blocked and key=='9' end,assignable=function(mods,key) return not bindings[signature(mods,key)] end,
+ bind=function(mods,key,callback) if fail and key=='8' then return nil end;local sig=signature(mods,key);bindings[sig]=callback;return {delete=function() bindings[sig]=nil end} end}}
+package.loaded['modules.sys_info']={start=function() end}
+dofile('Toolkit/init.lua');assert(not desktopToolkit.popupShortcut and not desktopToolkit.popupBinding and next(bindings)==nil)
+local ctrl={key='k',mods={'cmd','ctrl'}}
+assert(desktopToolkit.savePopup(ctrl));assert(desktopToolkit.popupShortcut.key=='K')
+assert(stored['desktoptoolkit.clipboard.shortcut.v1'].mods[1]=='ctrl')
+bindings['ctrl+cmd+K']();assert(popped==1)
+assert(desktopToolkit.savePopup(ctrl));assert(bindings['ctrl+cmd+K'])
+assert(not desktopToolkit.save({enabled=false,shortcuts={left={key='k',mods={'ctrl','cmd'}}}}));assert(bindings['ctrl+cmd+K'])
+assert(not desktopToolkit.savePopup({key='K',mods={'shift'}}));assert(bindings['ctrl+cmd+K'])
+blocked=true;assert(not desktopToolkit.savePopup({key='9',mods={'ctrl'}}));assert(bindings['ctrl+cmd+K'])
+fail=true;assert(not desktopToolkit.savePopup({key='8',mods={'ctrl'}}));assert(bindings['ctrl+cmd+K'])
+assert(stored['desktoptoolkit.clipboard.shortcut.v1'].key=='K')
+assert(desktopToolkit.savePopup({key='',mods={}}));assert(next(bindings)==nil and not stored['desktoptoolkit.clipboard.shortcut.v1'])
+assert(desktopToolkit.save({enabled=true,shortcuts={left={key='1',mods={'ctrl'}}}}))
+assert(not desktopToolkit.savePopup({key='1',mods={'ctrl'}}));assert(bindings['ctrl+1'])
+assert(desktopToolkit.savePopup(ctrl));assert(stored['desktoptoolkit.clipboard.shortcut.v1'].key=='K')
+-- A fresh process has no runtime bindings, while settings persist.
+bindings={};dofile('Toolkit/init.lua');assert(bindings['ctrl+cmd+K'])
+assert(desktopToolkit.savePopup({key='',mods={}}));assert(bindings['ctrl+1'])
+print('Popup defaults, normalization, cross-module conflicts, rollback, dispatch, removal and cold-start restoration passed')

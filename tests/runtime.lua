@@ -3,7 +3,7 @@ local stored, callbacks = {}, {}
 local function menu() return setmetatable({}, {__index=function() return function(self) return self end end}) end
 hs = {
     processInfo={bundleID="dev.local.DesktopToolkit",bundlePath="."}, configdir="/isolated/toolkit",
-    settings={bundleID="dev.local.DesktopToolkit",get=function(k) return stored[k] end,set=function(k,v) stored[k]=v end},
+    settings={bundleID="dev.local.DesktopToolkit",clear=function(k) stored[k]=nil end,get=function(k) return stored[k] end,set=function(k,v) stored[k]=v end},
     accessibilityState=function() return true end,
     menubar={new=menu}, alert={show=function() end},
     hotkey={assignable=function(_,k) return k ~= "9" end,systemAssigned=function() return false end,
