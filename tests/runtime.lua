@@ -5,7 +5,7 @@ hs = {
     processInfo={bundleID="dev.local.DesktopToolkit",bundlePath="."}, configdir="/isolated/toolkit",
     settings={bundleID="dev.local.DesktopToolkit",clear=function(k) stored[k]=nil end,get=function(k) return stored[k] end,set=function(k,v) stored[k]=v end},
     accessibilityState=function() return true end,
-    menubar={new=menu}, alert={show=function() end},
+    menuIcon=function(value) assert(value==false) end,openConsoleOnDockClick=function(value) assert(value==false) end,nivletAppearance=function() end,menubar={new=menu}, alert={show=function() end},
     hotkey={assignable=function(_,k) return k ~= "9" end,systemAssigned=function() return false end,
         bind=function(_,k,fn) callbacks[k]=fn; return {delete=function() callbacks[k]=nil end} end},
 }
@@ -28,3 +28,18 @@ assert(require("modules.windows").run("restore",w)); assert(actual.x==10 and act
 assert(not require("modules.windows").run("restore",w))
 assert(desktopToolkit.save({enabled=false,shortcuts={}})); assert(#desktopToolkit.bindings==0 and not callbacks["1"])
 print("Runtime binding rollback, dispatch, restore and disable passed")
+
+assert(desktopToolkit.general.showMenu and desktopToolkit.general.appearance=="system")
+assert(not desktopToolkit.saveGeneral({showMenu=true,appearance="invalid"}))
+assert(not stored["desktoptoolkit.general.v1"])
+assert(desktopToolkit.saveGeneral({showMenu=false,appearance="dark"}))
+assert(stored["desktoptoolkit.general.v1"].appearance=="dark")
+assert(desktopToolkit.saveGeneral({showMenu=true,appearance="light"}))
+assert(desktopToolkit.saveGeneral({showMenu=true,appearance="system"}))
+local opened
+local original=desktopToolkit.openSettings
+desktopToolkit.openSettings=function(section) opened=section end
+hs.dockIconClickCallback()
+assert(opened=="generalSection")
+desktopToolkit.openSettings=original
+print("General settings validation, persistence and reopen dispatch passed")

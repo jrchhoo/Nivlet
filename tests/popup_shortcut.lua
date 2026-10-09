@@ -5,7 +5,7 @@ local function signature(mods,key) return table.concat(mods,'+')..'+'..key end
 local function menu() return {setTitle=function(self) return self end,setTooltip=function(self) return self end,setMenu=function(self,fn) self.items=fn;return self end,popupMenu=function(_,point) assert(point.x==-100 and point.y==20);popped=popped+1 end} end
 hs={processInfo={bundleID='dev.local.DesktopToolkit',bundlePath='.'},configdir='/isolated/toolkit',
  settings={bundleID='dev.local.DesktopToolkit',get=function(k) return stored[k] end,set=function(k,v) stored[k]=v end,clear=function(k) stored[k]=nil end},
- menubar={new=menu},mouse={absolutePosition=function() return {x=-100,y=20} end},alert={show=function() end},accessibilityState=function() return true end,
+ menuIcon=function(value) assert(value==false) end,openConsoleOnDockClick=function(value) assert(value==false) end,nivletAppearance=function() end,menubar={new=menu},mouse={absolutePosition=function() return {x=-100,y=20} end},alert={show=function() end},accessibilityState=function() return true end,
  hotkey={systemAssigned=function(_,key) return blocked and key=='9' end,assignable=function(mods,key) return not bindings[signature(mods,key)] end,
  bind=function(mods,key,callback) if fail and key=='8' then return nil end;local sig=signature(mods,key);bindings[sig]=callback;return {delete=function() bindings[sig]=nil end} end}}
 package.loaded['modules.sys_info']={start=function() end}

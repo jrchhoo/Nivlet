@@ -13,4 +13,5 @@ git -C "$upstream_dir" apply --check "$project_dir/patches/runtime-isolation.pat
 git -C "$upstream_dir" apply "$project_dir/patches/runtime-isolation.patch"
 git -C "$upstream_dir" apply "$project_dir/patches/xcode-compatibility.patch"
 git -C "$upstream_dir" apply "$project_dir/patches/branding.patch"
+git -C "$upstream_dir" apply "$project_dir/patches/general-appearance.patch"
 cp "$project_dir/Hammerspoon-Downstream.xcconfig" "$upstream_dir/Hammerspoon-Downstream.xcconfig"

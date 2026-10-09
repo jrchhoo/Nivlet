@@ -13,6 +13,28 @@ local browser = require("modules.browser")
 browser.start()
 clipboard.start()
 local app = {bindings={}}
+local generalKey = "desktoptoolkit.general.v1"
+local function validateGeneral(value)
+    if type(value) ~= "table" or type(value.showMenu) ~= "boolean" or
+        (value.appearance ~= "system" and value.appearance ~= "light" and value.appearance ~= "dark") then
+        return nil, "通用设置格式无效"
+    end
+    return {showMenu=value.showMenu, appearance=value.appearance}
+end
+app.general = validateGeneral(hs.settings.get(generalKey)) or {showMenu=true,appearance="system"}
+-- The upstream hammer menu duplicates our own settings entry.
+hs.menuIcon(false)
+hs.openConsoleOnDockClick(false)
+hs.nivletAppearance(app.general.appearance)
+function app.saveGeneral(value)
+    local config, message = validateGeneral(value)
+    if not config then return false, message end
+    hs.nivletAppearance(config.appearance)
+    if config.showMenu then app.menu:returnToMenuBar() else app.menu:removeFromMenuBar() end
+    app.general=config
+    hs.settings.set(generalKey,config)
+    return true, "通用设置已保存"
+end
 _G.desktopToolkit = app
 local key = "desktoptoolkit.preferences.v1"
 app.config = preferences.validate(hs.settings.get(key)) or preferences.defaults()
@@ -90,7 +112,7 @@ end
 local ok, message = install(app.config)
 if not ok then hs.alert.show(message) end
 local function reply(ok, message, action)
-    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,config=app.config,input=input.config,sources=input.sources(),clipboard=clipboard.snapshot(),popupShortcut=app.popupShortcut or false,system=system.config,browser=browser.config,browsers=browser.installed(),accessibility=hs.accessibilityState()}) .. ")") end
+    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,general=app.general,config=app.config,input=input.config,sources=input.sources(),clipboard=clipboard.snapshot(),popupShortcut=app.popupShortcut or false,system=system.config,browser=browser.config,browsers=browser.installed(),accessibility=hs.accessibilityState()}) .. ")") end
 end
 function app.openSettings(section, focus)
     section=type(section)=="string" and section or nil
@@ -107,6 +129,7 @@ function app.openSettings(section, focus)
             if app.settingsSection then app.settings:evaluateJavaScript("window.showSection(" .. hs.json.encode({app.settingsSection}) .. "[0])") end
             if app.settingsFocus then app.settings:evaluateJavaScript("document.getElementById("..hs.json.encode({app.settingsFocus}).."[0]).focus()") end
         end
+        if body.action == "saveGeneral" then local success, result = app.saveGeneral(body.config); reply(success, result, body.action) end
         if body.action == "save" then local success, result = app.save(body.config); reply(success, result, body.action) end
         if body.action == "savePopup" then local success, result = app.savePopup(body.config); reply(success, result, body.action) end
         if body.action == "saveBrowser" then local success, result = browser.save(body.config); reply(success, result, body.action) end
@@ -158,4 +181,6 @@ system.start(function() app.openSettings("systemSection") end)
 app.menu = hs.menubar.new():setTitle(""):setTooltip("Nivlet 设置")
 if hs.image then app.menu:setIcon(hs.image.imageFromName("NSActionTemplate")) end
 app.menu:setMenu({{title="设置…",fn=app.openSettings},{title="退出 Nivlet",fn=function() os.exit() end}})
+if not app.general.showMenu then app.menu:removeFromMenuBar() end
+hs.dockIconClickCallback = function() app.openSettings("generalSection") end
 print("Nivlet ready", hs.configdir, hs.settings.bundleID, "bindings", #app.bindings)
