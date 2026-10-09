@@ -43,11 +43,11 @@ git diff --check
 
 ## 发布前仍需完成
 
-稳定签名身份、Developer ID、公证、Gatekeeper 下载流程、其他 macOS / Intel / 多显示器验证，以及完整第三方 notices。当前不发布 Runtime 二进制安装包。
+稳定签名身份、Developer ID、公证、Gatekeeper 下载流程、其他 macOS / Intel / 多显示器验证，以及完整第三方 notices。当前已提供未公证的 arm64 预发布安装包，正式稳定版尚未发布。
 
 ## 名称兼容
 
-应用和项目显示名称已改为 Nivlet。已有开发用户的 Bundle ID、设置键和数据目录沿用 `dev.local.DesktopToolkit` / `desktoptoolkit.*`，避免改名清空设置与历史。它们是兼容标识，不是界面名称。上游 Hammerspoon 名称保留在来源、许可证和开发接口说明中。
+品牌名为 Nivlet，展示名称为 Nivlet for Mac；仓库和应用文件名保持 Nivlet。已有开发用户的 Bundle ID、设置键和数据目录沿用 `dev.local.DesktopToolkit` / `desktoptoolkit.*`，避免改名清空设置与历史。它们是兼容标识，不是界面名称。上游 Hammerspoon 名称保留在来源、许可证和开发接口说明中。
 
 ## 首版候选包
 
