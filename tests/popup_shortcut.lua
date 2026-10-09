@@ -28,3 +28,19 @@ assert(desktopToolkit.savePopup(ctrl));assert(stored['desktoptoolkit.clipboard.s
 bindings={};dofile('Toolkit/init.lua');assert(bindings['ctrl+cmd+K'])
 assert(desktopToolkit.savePopup({key='',mods={}}));assert(bindings['ctrl+1'])
 print('Popup defaults, normalization, cross-module conflicts, rollback, dispatch, removal and cold-start restoration passed')
+
+-- Native menu callbacks supply metadata as their second argument, not a focus ID.
+require('modules.input_method').sources=function() return {} end
+require('modules.browser').installed=function() return {} end
+require('modules.clipboard').snapshot=function() return {} end
+hs.json={encode=function(value)
+    local function check(v)
+        assert(type(v)~='function','Menu callback leaked into settings JSON')
+        if type(v)=='table' then for _,item in pairs(v) do check(item) end end
+    end
+    check(value);return '{}'
+end}
+desktopToolkit.settings={show=function(self) return self end,bringToFront=function(self) return self end,evaluateJavaScript=function() end}
+desktopToolkit.menu.items[1].fn(nil,{fn=function() end})
+assert(desktopToolkit.settingsFocus==nil and desktopToolkit.settingsSection==nil)
+print('Native menu metadata is not treated as a settings focus ID')

@@ -185,3 +185,26 @@ index 1f0d2fb..a05174d 100644
                           HSAppleScriptEnabledKey: @NO,
                           HSOpenConsoleOnDockClickKey: @YES,
                           HSPreferencesDarkModeKey: @NO,
+diff --git a/extensions/webview/libwebview.m b/extensions/webview/libwebview.m
+index 9740d89..b14166d 100644
+--- a/extensions/webview/libwebview.m
++++ b/extensions/webview/libwebview.m
+@@ -88,7 +88,7 @@ void delayUntilViewStopsLoading(HSWebViewView *theView, dispatch_block_t block)
+ 
+         // Configure the window
+         self.releasedWhenClosed = NO;
+-        self.backgroundColor    = [NSColor clearColor];
++        self.backgroundColor    = [NSColor windowBackgroundColor];
+         self.opaque             = YES;
+         self.hasShadow          = NO;
+         self.ignoresMouseEvents = NO;
+@@ -1264,6 +1264,9 @@ static int webview_transparent(lua_State *L) {
+         lua_pushboolean(L, !(BOOL)theWindow.opaque);
+     } else {
+         theWindow.opaque = !(lua_toboolean(L, 2));
++        theWindow.backgroundColor = theWindow.opaque ? [NSColor windowBackgroundColor] : [NSColor clearColor];
++        // Draw the titlebar over the opaque window color instead of the system material.
++        theWindow.titlebarAppearsTransparent = theWindow.opaque;
+         [theWindow.contentView setValue:@(lua_toboolean(L, 2)) forKey:@"drawsTransparentBackground"];
+         lua_settop(L, 1) ;
+     }

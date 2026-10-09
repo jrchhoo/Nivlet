@@ -94,6 +94,7 @@ local function reply(ok, message)
 end
 function app.openSettings(section, focus)
     section=type(section)=="string" and section or nil
+    focus=type(focus)=="string" and focus or nil
     app.settingsSection=section
     app.settingsFocus=focus
     if app.settings then app.settings:show():bringToFront(true); reply(true, ""); if section then app.settings:evaluateJavaScript("window.showSection(" .. hs.json.encode({section}) .. "[0])") end; if focus then app.settings:evaluateJavaScript("document.getElementById("..hs.json.encode({focus}).."[0]).focus()") end; return end
