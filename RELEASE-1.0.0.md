@@ -1,6 +1,6 @@
 # Nivlet 1.0.0 候选版说明
 
-当前版本：**v1.0.0-rc.2**；应用内版本 **1.0.0 / Build 2**。本机 Apple Silicon（arm64）候选已构建、安装并验收。该版本用于保存当前可用阶段，不代表正式公开分发。
+当前版本：**v1.0.0-rc.3**；应用内版本 **1.0.0 / Build 3**。Build 3 将关于页展示名称改为 Nivlet for Mac，功能沿用已验收的 Build 2；新包已构建并校验，未替换本机安装版。此版本为公开测试包，尚非正式版。
 
 ## 包含的功能
 
@@ -30,12 +30,14 @@
 - 正式分发仍需 Developer ID、Release 构建、公证、下载后的 Gatekeeper 和干净用户/其他机器安装升级验证。本机目前没有可用 Developer ID 身份。
 - 实体鼠标 Option 点击、多显示器、Intel 和其他 macOS 尚未完整验证；回调真实粘贴通过不能替代实体点击验收。
 - 菜单排列非阻塞待核查：网速与剪贴板相邻，剪贴板与 N 主图标之间测得约 48pt 间隔；未确定是否有其他状态项占位，不认定为额外空白，不据此修改代码。
-- 构建已收集依赖声明、78 个许可文件和 Lua README；公开二进制前仍需最终许可覆盖复核。
+- 包内保留上游声明、依赖 acknowledgements、78 个许可文件和 Lua README；已检查收集结果与打包文件一致。此检查不等同于法律审查。
 
 ## 安装包和代码版本
 
-本机候选包位于 `build/packages/`，目录被 Git 忽略。包中不含个人迁移配置或剪贴板缓存，采用 ad-hoc 开发签名。本轮仅推送源代码、用户说明、测试和版本标签 `v1.0.0-rc.2`，不上传安装包或创建公开 GitHub Release。
+安装包见 [v1.0.0-rc.3 预发布](https://github.com/jrchhoo/Nivlet/releases/tag/v1.0.0-rc.3)，提供 DMG、ZIP 和 SHA-256 文件。仅提供 arm64 包，采用 ad-hoc 开发签名，未公证；下载后可能被 Gatekeeper 阻止。包声明最低 macOS 13.0，但其他 macOS 和其他机器尚未验收。
+
+本机文件位于被 Git 忽略的 `build/packages/`。Git 不收录安装包；仅将上述三个发布文件上传至 Release。包中不含个人迁移配置或剪贴板缓存。旧 v1.0.0-rc.2 标签与发布说明保留。
 
 安装时将 Nivlet.app 拖入 Applications。升级只替换 App，保留数据目录；开发签名变更可能要求重新授权辅助功能。所有可编辑设置在窗口右下角保存，权限检测和历史操作即时执行。来源应用分流需将 macOS 默认网页浏览器选为 Nivlet。
 
-`VERSION` 为产品版本来源，`NIVLET_BUILD_NUMBER` 指定 build。重现本候选使用 `NIVLET_BUILD_NUMBER=2` 构建，再运行 `sh scripts/package-local.sh`。详细流程见 [DEVELOPMENT.md](DEVELOPMENT.md)。
+`VERSION` 为产品版本来源，`NIVLET_BUILD_NUMBER` 指定 build。重现本候选使用 `NIVLET_BUILD_NUMBER=3` 构建，再运行 `sh scripts/package-local.sh`。详细流程见 [DEVELOPMENT.md](DEVELOPMENT.md)。

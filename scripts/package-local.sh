@@ -4,18 +4,19 @@ set -eu
 project_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 app_path="$project_dir/build/DerivedData/Build/Products/Debug/Nivlet.app"
 version=$(cat "$project_dir/VERSION")
+build=$(/usr/libexec/PlistBuddy -c Print:CFBundleVersion "$app_path/Contents/Info.plist")
 test "$(/usr/libexec/PlistBuddy -c Print:CFBundleShortVersionString "$app_path/Contents/Info.plist")" = "$version"
 codesign --verify --deep --strict "$app_path"
 arch=$(lipo -archs "$app_path/Contents/MacOS/Nivlet" | tr ' ' '-')
 output="$project_dir/build/packages"
 mkdir -p "$output"
-base="Nivlet-$version-$arch-local"
+base="Nivlet-$version-build$build-$arch-local"
 stage=$(mktemp -d "$project_dir/build/package-stage.XXXXXX")
 trap 'rm -rf "$stage"' EXIT HUP INT TERM
 ditto "$app_path" "$stage/Nivlet.app"
 ln -s /Applications "$stage/Applications"
 cat > "$stage/安装说明-Read-Me.txt" <<'TXT'
-Nivlet 1.0.0 — 本机验收候选包 / Local validation build
+Nivlet for Mac 1.0.0 — 本机验收候选包 / Local validation build
 
 将 Nivlet.app 拖入 Applications 后打开。无需另装 Hammerspoon。
 在通用设置配置外观和语言；窗口、剪贴板、输入法、浏览器及应用快捷启动按需开启。

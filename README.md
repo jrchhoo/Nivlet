@@ -1,4 +1,4 @@
-# Nivlet
+# Nivlet for Mac
 
 <p align="center">
   <img src="assets/nivlet-icon.png" alt="Nivlet 应用图标" width="160">
@@ -6,7 +6,11 @@
 
 把常用的 macOS 桌面功能放进菜单栏：剪贴板历史、系统信息、窗口调整、自动切换输入法，按规则选择浏览器，以及快捷键启动应用。使用时无需另外安装 Hammerspoon，也无需编辑配置文件。
 
-**当前代码版本为 v1.0.0-rc.2（应用 1.0.0 / Build 2），已通过本机候选验收，尚未正式公开发布。** 本机包使用开发签名，尚未完成 Developer ID、公证和跨机器验收。安装与首版范围见 [首版说明](RELEASE-1.0.0.md)，自行构建见 [构建说明](DEVELOPMENT.md)。
+**当前预发布版本为 v1.0.0-rc.3（应用 1.0.0 / Build 3）。** 展示名称为 Nivlet for Mac，应用文件名仍为 `Nivlet.app`。
+
+从 [GitHub Releases](https://github.com/jrchhoo/Nivlet/releases/tag/v1.0.0-rc.3) 下载 DMG 或 ZIP；目前仅提供 Apple Silicon（arm64）测试包，附 SHA-256 校验文件。
+
+本机包使用开发签名，尚未完成 Developer ID、公证和跨机器验收。安装与首版范围见 [首版说明](RELEASE-1.0.0.md)，自行构建见 [构建说明](DEVELOPMENT.md)。
 
 ## 开始使用
 
