@@ -3,6 +3,7 @@ assert(hs.settings.bundleID == "dev.local.DesktopToolkit", "Unexpected settings 
 assert(not hs.configdir:find(".hammerspoon", 1, true), "Personal configuration detected")
 local root = hs.processInfo.bundlePath .. "/Contents/Resources/Toolkit/"
 package.path = root .. "?.lua;" .. package.path
+local i18n = require("modules.i18n")
 local preferences = require("modules.preferences")
 local windows = require("modules.windows")
 local input = require("modules.input_method")
@@ -17,11 +18,13 @@ local generalKey = "desktoptoolkit.general.v1"
 local function validateGeneral(value)
     if type(value) ~= "table" or type(value.showMenu) ~= "boolean" or
         (value.appearance ~= "system" and value.appearance ~= "light" and value.appearance ~= "dark") then
-        return nil, "通用设置格式无效"
+        return nil, i18n.t("通用设置格式无效")
     end
-    return {showMenu=value.showMenu, appearance=value.appearance}
+    local language=value.language or "system"
+    if language~="system" and language~="zh-Hans" and language~="en" then return nil,i18n.t("语言设置无效") end
+    return {showMenu=value.showMenu, appearance=value.appearance,language=language}
 end
-app.general = validateGeneral(hs.settings.get(generalKey)) or {showMenu=true,appearance="system"}
+app.general = validateGeneral(hs.settings.get(generalKey)) or {showMenu=true,appearance="system",language="system"}
 -- The upstream hammer menu duplicates our own settings entry.
 hs.menuIcon(false)
 hs.openConsoleOnDockClick(false)
@@ -32,8 +35,13 @@ function app.saveGeneral(value)
     hs.nivletAppearance(config.appearance)
     if config.showMenu then app.menu:returnToMenuBar() else app.menu:removeFromMenuBar() end
     app.general=config
+    i18n.configure(config.language)
+    if app.updateMenu then app.updateMenu() end
+    if app.settings then app.settings:windowTitle(i18n.t("Nivlet 设置")) end
+    clipboard.menu:setTooltip(i18n.t("Nivlet 剪贴板历史"))
+    system.menu:setTooltip(i18n.t("Nivlet 系统信息")):setMenu(nil):setMenu(system.menuItems)
     hs.settings.set(generalKey,config)
-    return true, "通用设置已保存"
+    return true, i18n.t("通用设置已保存")
 end
 _G.desktopToolkit = app
 local key = "desktoptoolkit.preferences.v1"
@@ -57,25 +65,25 @@ app.popupShortcut = normalizePopup(hs.settings.get(popupKey))
 local function installPopup(shortcut)
     if app.popupBinding then app.popupBinding:delete();app.popupBinding=nil end
     if not shortcut then return true end
-    if hs.hotkey.systemAssigned(shortcut.mods,shortcut.key) or not hs.hotkey.assignable(shortcut.mods,shortcut.key) then return false,"剪贴板快捷键被系统占用或无法注册" end
+    if hs.hotkey.systemAssigned(shortcut.mods,shortcut.key) or not hs.hotkey.assignable(shortcut.mods,shortcut.key) then return false,i18n.t("剪贴板快捷键被系统占用或无法注册") end
     app.popupBinding = hs.hotkey.bind(shortcut.mods,shortcut.key,clipboard.showPopup)
-    if not app.popupBinding then return false,"剪贴板快捷键注册失败" end
+    if not app.popupBinding then return false,i18n.t("剪贴板快捷键注册失败") end
     return true
 end
 function app.savePopup(value)
     local shortcut, message = normalizePopup(value)
     if message then return false,message end
-    if popupConflicts(shortcut, app.config) then return false,"剪贴板快捷键与窗口管理配置重复" end
+    if popupConflicts(shortcut, app.config) then return false,i18n.t("剪贴板快捷键与窗口管理配置重复") end
     if not (sameShortcut(shortcut, app.popupShortcut) and app.popupBinding) then
         local success, result = installPopup(shortcut)
         if not success then
             local restored = installPopup(app.popupShortcut)
-            return false, restored and result or result.."；旧快捷键也无法恢复，请重新配置"
+            return false, restored and result or result..i18n.t("；旧快捷键也无法恢复，请重新配置")
         end
     end
     app.popupShortcut=shortcut
     if shortcut then hs.settings.set(popupKey,shortcut) else hs.settings.clear(popupKey) end
-    return true, shortcut and "剪贴板菜单快捷键已保存" or "剪贴板菜单快捷键已解除"
+    return true, shortcut and i18n.t("剪贴板菜单快捷键已保存") or i18n.t("剪贴板菜单快捷键已解除")
 end
 local function clearBindings()
     for _, binding in ipairs(app.bindings) do binding:delete() end
@@ -86,12 +94,12 @@ local function install(config)
     for _, action in ipairs(windows.actions) do
         local item = config.shortcuts[action]
         if item then
-            if not hs.hotkey.assignable(item.mods, item.key) or hs.hotkey.systemAssigned(item.mods, item.key) then clearBindings(); return false, "快捷键被系统占用：" .. item.key end
+            if not hs.hotkey.assignable(item.mods, item.key) or hs.hotkey.systemAssigned(item.mods, item.key) then clearBindings(); return false, i18n.t("快捷键被系统占用：") .. item.key end
             local binding = hs.hotkey.bind(item.mods, item.key, function()
                 local ok, message = windows.run(action)
                 if not ok then hs.alert.show(message) end
             end)
-            if not binding then clearBindings(); return false, "无法注册快捷键：" .. item.key end
+            if not binding then clearBindings(); return false, i18n.t("无法注册快捷键：") .. item.key end
             table.insert(app.bindings, binding)
         end
     end
@@ -100,19 +108,19 @@ end
 function app.save(value)
     local config, message = preferences.validate(value)
     if not config then return false, message end
-    if popupConflicts(app.popupShortcut, config) then return false,"窗口快捷键与剪贴板菜单配置重复" end
-    if config.enabled and not hs.accessibilityState() then return false, "请先在系统设置开启 Nivlet 的辅助功能权限" end
+    if popupConflicts(app.popupShortcut, config) then return false,i18n.t("窗口快捷键与剪贴板菜单配置重复") end
+    if config.enabled and not hs.accessibilityState() then return false, i18n.t("请先在系统设置开启 Nivlet 的辅助功能权限") end
     clearBindings()
     local ok, errorMessage = install(config)
     if not ok then install(app.config); return false, errorMessage end
     app.config = config
     hs.settings.set(key, config)
-    return true, "已保存"
+    return true, i18n.t("已保存")
 end
 local ok, message = install(app.config)
 if not ok then hs.alert.show(message) end
 local function reply(ok, message, action)
-    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,general=app.general,config=app.config,input=input.config,sources=input.sources(),clipboard=clipboard.snapshot(),popupShortcut=app.popupShortcut or false,system=system.config,browser=browser.config,browsers=browser.installed(),accessibility=hs.accessibilityState()}) .. ")") end
+    if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,language=i18n.language(),translations=i18n.dictionary,general=app.general,config=app.config,input=input.config,sources=input.sources(),clipboard=clipboard.snapshot(),popupShortcut=app.popupShortcut or false,system=system.config,browser=browser.config,browsers=browser.installed(),accessibility=hs.accessibilityState()}) .. ")") end
 end
 function app.openSettings(section, focus)
     section=type(section)=="string" and section or nil
@@ -134,7 +142,7 @@ function app.openSettings(section, focus)
         if body.action == "savePopup" then local success, result = app.savePopup(body.config); reply(success, result, body.action) end
         if body.action == "saveBrowser" then local success, result = browser.save(body.config); reply(success, result, body.action) end
         if body.action == "openBrowserURL" then local success, result = browser.open(body.url,body.sourceBundle); reply(success, result, body.action) end
-        if body.action == "testBrowserURL" then local selected, result = browser.resolve(body.url,body.sourceBundle); reply(selected~=nil,selected and "将打开："..(function() for _,item in ipairs(browser.browsers) do if item.id==selected then return item.name end end return selected end)() or result) end
+        if body.action == "testBrowserURL" then local selected, result = browser.resolve(body.url,body.sourceBundle); reply(selected~=nil,selected and i18n.t("将打开：")..(function() for _,item in ipairs(browser.browsers) do if item.id==selected then return item.name end end return selected end)() or result) end
         if body.action == "saveSystem" then local success, result = system.save(body.config); reply(success, result, body.action) end
         if body.action == "saveInput" then local success, result = input.save(body.config); reply(success, result, body.action) end
         if body.action == "saveClipboard" then local success, result = clipboard.save(body.config); reply(success, result, body.action) end
@@ -147,7 +155,7 @@ function app.openSettings(section, focus)
         if body.action == "copyClipboard" then local success, result = clipboard.copy(body.id); reply(success, result, body.action) end
         if body.action == "clearClipboard" then local success, result = clipboard.clear(); reply(success, result, body.action) end
         if body.action == "chooseApp" or body.action == "chooseBrowserApp" then
-            local prompt=body.action=="chooseBrowserApp" and "选择链接来源应用" or "选择要配置输入法的应用"
+            local prompt=body.action=="chooseBrowserApp" and i18n.t("选择链接来源应用") or i18n.t("选择要配置输入法的应用")
             local paths = hs.dialog.chooseFileOrFolder(prompt, "/Applications", true, false, false, {"app"}, true)
             local path = paths
             if type(paths)=="table" then path=paths[1] or paths["1"] end
@@ -157,14 +165,14 @@ function app.openSettings(section, focus)
                     local value = {bundleID=info.CFBundleIdentifier,name=info.CFBundleDisplayName or info.CFBundleName or info.CFBundleIdentifier}
                     local callback=body.action=="chooseBrowserApp" and "window.addBrowserAppRule(" or "window.addInputRule("
                     app.settings:evaluateJavaScript(callback .. hs.json.encode(value) .. ")")
-                else reply(false, "无法识别所选应用") end
+                else reply(false, i18n.t("无法识别所选应用")) end
             end
         end
     end)
     local file = assert(io.open(root .. "settings.html", "r"))
     local html = file:read("*a"); file:close()
     app.settings = hs.webview.new({x=180,y=160,w=980,h=720}, {}, app.controller)
-        :windowStyle({"titled","closable","resizable"}):windowTitle("Nivlet 设置")
+        :windowStyle({"titled","closable","resizable"}):windowTitle(i18n.t("Nivlet 设置"))
         :transparent(false):allowTextEntry(true):html(html):show():bringToFront(true)
 end
 clipboard.startMenu(function(mode)
@@ -172,15 +180,19 @@ clipboard.startMenu(function(mode)
     app.openSettings("clipSection",id)
 end)
 if popupConflicts(app.popupShortcut, app.config) then
-    hs.alert.show("剪贴板菜单快捷键与窗口配置冲突，未启用菜单绑定")
+    hs.alert.show(i18n.t("剪贴板菜单快捷键与窗口配置冲突，未启用菜单绑定"))
 else
     local installed, errorMessage = installPopup(app.popupShortcut)
     if not installed then hs.alert.show(errorMessage) end
 end
 system.start(function() app.openSettings("systemSection") end)
-app.menu = hs.menubar.new():setTitle(""):setTooltip("Nivlet 设置")
+app.menu = hs.menubar.new():setTitle(""):setTooltip(i18n.t("Nivlet 设置"))
 if hs.image then app.menu:setIcon(hs.image.imageFromName("NSActionTemplate")) end
-app.menu:setMenu({{title="设置…",fn=app.openSettings},{title="退出 Nivlet",fn=function() os.exit() end}})
+function app.updateMenu()
+    app.menu:setTooltip(i18n.t("Nivlet 设置")):setMenu(nil)
+    app.menu:setMenu({{title=i18n.t("设置…"),fn=app.openSettings},{title=i18n.t("退出 Nivlet"),fn=function() os.exit() end}})
+end
+app.updateMenu()
 if not app.general.showMenu then app.menu:removeFromMenuBar() end
 hs.dockIconClickCallback = function() app.openSettings("generalSection") end
 print("Nivlet ready", hs.configdir, hs.settings.bundleID, "bindings", #app.bindings)

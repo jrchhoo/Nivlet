@@ -1,6 +1,6 @@
 package.path='Toolkit/?.lua;'..package.path
 local saved,opened
-hs={settings={get=function() return saved end,set=function(_,v) saved=v end},application={pathForBundleID=function(id) if id~='org.mozilla.firefox' then return '/installed.app' end end},urlevent={openURLWithBundle=function(url,id) opened={url,id};return true end},alert={show=function() end}}
+hs={settings={get=function() return saved end,set=function(_,v) saved=v end},application={pathForBundleID=function(id) if id~='org.mozilla.firefox' then return '/installed.app' end end},urlevent={processStartupEvents=function() end,openURLWithBundle=function(url,id) opened={url,id};return true end},alert={show=function() end}}
 local b=require('modules.browser');b.start();assert(not b.config.enabled)
 local cfg=b.defaults();cfg.enabled=true;cfg.rules={{domain='Example.COM',browser='com.google.Chrome',subdomains=true}}
 assert(b.save(cfg));assert(saved.rules[1].domain=='example.com')
@@ -21,3 +21,13 @@ hs.application.applicationForPID=function(pid) if pid==42 then return {bundleID=
 b.start();hs.urlevent.httpCallback('https','other.test',{},'https://other.test',42);assert(opened[2]=='com.microsoft.edgemac')
 cfg.appRules[2]=cfg.appRules[1];assert(not b.save(cfg));assert(#b.config.appRules==1)
 print('Source application rules, domain priority, sender PID and duplicate rejection passed')
+
+local startupCount=0
+hs.urlevent.processStartupEvents=function()
+    startupCount=startupCount+1
+    assert(type(hs.urlevent.httpCallback)=='function')
+    hs.urlevent.httpCallback('https','other.test',{},'https://other.test',42)
+end
+b.start()
+assert(startupCount==1 and opened[2]=='com.microsoft.edgemac')
+print('Startup URLs drain only after HTTP callback is installed')

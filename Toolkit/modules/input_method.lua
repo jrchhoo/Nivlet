@@ -1,3 +1,4 @@
+local i18n = require("modules.i18n")
 local M = {config={enabled=false,rules={}}}
 local settingsKey = "desktoptoolkit.input.v1"
 function M.sources()
@@ -14,12 +15,12 @@ function M.sources()
     return result
 end
 function M.validate(value, available)
-    if type(value) ~= "table" or type(value.enabled) ~= "boolean" or type(value.rules) ~= "table" then return nil, "输入法设置格式无效" end
+    if type(value) ~= "table" or type(value.enabled) ~= "boolean" or type(value.rules) ~= "table" then return nil, i18n.t("输入法设置格式无效") end
     local result, used = {enabled=value.enabled,rules={}}, {}
     for _, rule in ipairs(value.rules) do
-        if type(rule) ~= "table" or type(rule.bundleID) ~= "string" or not rule.bundleID:match("^[%w_%-]+%.[%w_.%-]+$") or type(rule.sourceID) ~= "string" or rule.sourceID == "" then return nil, "请选择应用和输入法" end
-        if used[rule.bundleID] then return nil, "同一应用只能配置一条输入法规则" end
-        if value.enabled and available and not available[rule.sourceID] then return nil, "输入法不可用，请重新选择：" .. rule.sourceID end
+        if type(rule) ~= "table" or type(rule.bundleID) ~= "string" or not rule.bundleID:match("^[%w_%-]+%.[%w_.%-]+$") or type(rule.sourceID) ~= "string" or rule.sourceID == "" then return nil, i18n.t("请选择应用和输入法") end
+        if used[rule.bundleID] then return nil, i18n.t("同一应用只能配置一条输入法规则") end
+        if value.enabled and available and not available[rule.sourceID] then return nil, i18n.t("输入法不可用，请重新选择：") .. rule.sourceID end
         used[rule.bundleID] = true
         table.insert(result.rules, {bundleID=rule.bundleID,sourceID=rule.sourceID,name=type(rule.name)=="string" and rule.name or rule.bundleID})
     end
@@ -54,7 +55,7 @@ function M.save(value)
     if not config then return false, message end
     M.configure(config)
     hs.settings.set(settingsKey, config)
-    return true, "输入法规则已保存"
+    return true, i18n.t("输入法规则已保存")
 end
 function M.start()
     local config = M.validate(hs.settings.get(settingsKey)) or {enabled=false,rules={}}

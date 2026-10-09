@@ -1,14 +1,15 @@
+local i18n = require("modules.i18n")
 local M = {entries={},paused=false,nextID=0}
 local settingsKey = "desktoptoolkit.clipboard.v1"
 function M.defaults()
     return {enabled=false,limit=50,minutes=30,images=true,persistent=false,excluded={"com.apple.Passwords","com.1password.1password","com.agilebits.onepassword7","com.bitwarden.desktop"}}
 end
 function M.validate(value)
-    if type(value)~="table" or type(value.enabled)~="boolean" or type(value.limit)~="number" or value.limit%1~=0 or value.limit<10 or value.limit>100 or type(value.minutes)~="number" or value.minutes%1~=0 or value.minutes<1 or value.minutes>120 or type(value.excluded)~="table" then return nil,"容量须为 10–100 条，保留时间须为 1–120 分钟" end
-    if value.images~=nil and type(value.images)~="boolean" or value.persistent~=nil and type(value.persistent)~="boolean" then return nil,"图片和缓存设置格式无效" end
+    if type(value)~="table" or type(value.enabled)~="boolean" or type(value.limit)~="number" or value.limit%1~=0 or value.limit<10 or value.limit>100 or type(value.minutes)~="number" or value.minutes%1~=0 or value.minutes<1 or value.minutes>120 or type(value.excluded)~="table" then return nil,i18n.t("容量须为 10–100 条，保留时间须为 1–120 分钟") end
+    if value.images~=nil and type(value.images)~="boolean" or value.persistent~=nil and type(value.persistent)~="boolean" then return nil,i18n.t("图片和缓存设置格式无效") end
     local config,seen={enabled=value.enabled,limit=value.limit,minutes=value.minutes,images=value.images~=false,persistent=value.persistent==true,excluded={}},{}
     for _,id in ipairs(value.excluded) do
-        if type(id)~="string" or not id:match("^[%w_%-]+%.[%w_.%-]+$") then return nil,"排除应用须填写有效 Bundle ID" end
+        if type(id)~="string" or not id:match("^[%w_%-]+%.[%w_.%-]+$") then return nil,i18n.t("排除应用须填写有效 Bundle ID") end
         if not seen[id] then table.insert(config.excluded,id);seen[id]=true end
     end
     return config
@@ -38,7 +39,7 @@ function M.persist()
         if entry.kind=="image" then
             if not entry.path then
                 local path=directory()..string.format("clip_%.0f_%d.png",entry.time*1000,entry.id)
-                if not entry.image:saveToFile(path,true,"PNG") then return false,"图片缓存写入失败" end
+                if not entry.image:saveToFile(path,true,"PNG") then return false,i18n.t("图片缓存写入失败") end
                 entry.path=path
             end
             table.insert(saved,{id=entry.id,kind="image",time=entry.time,path=entry.path})
@@ -134,51 +135,51 @@ end
 function M.save(value)
     local config,message=M.validate(value)
     if not config then return false,message end
-    if config.enabled and config.persistent and not ensureDirectory() then return false,"无法创建独立剪贴板缓存目录" end
+    if config.enabled and config.persistent and not ensureDirectory() then return false,i18n.t("无法创建独立剪贴板缓存目录") end
     local old=M.config
     M.config=config
     local ok,errorMessage=M.persist()
     if not ok then M.config=old;return false,errorMessage end
     M.configure(config);hs.settings.set(settingsKey,config)
-    return true,"剪贴板设置已保存"
+    return true,i18n.t("剪贴板设置已保存")
 end
 function M.pause()
-    if not M.config.enabled then return false,"请先启用剪贴板历史" end
+    if not M.config.enabled then return false,i18n.t("请先启用剪贴板历史") end
     M.paused=not M.paused;M.lastCount=hs.pasteboard.changeCount()
-    return true,M.paused and "已暂停记录" or "已恢复记录"
+    return true,M.paused and i18n.t("已暂停记录") or i18n.t("已恢复记录")
 end
 function M.copy(id,target)
     M.prune()
     for _,entry in ipairs(M.entries) do
         if entry.id==id then
-            if target and not hs.accessibilityState() then return false,"直接粘贴需要 Nivlet 辅助功能权限" end
+            if target and not hs.accessibilityState() then return false,i18n.t("直接粘贴需要 Nivlet 辅助功能权限") end
             local ok
             if entry.kind=="image" then ok=hs.pasteboard.writeObjects(entry.image) else ok=hs.pasteboard.setContents(entry.text) end
-            if not ok then return false,"复制失败" end
+            if not ok then return false,i18n.t("复制失败") end
             M.lastCount=hs.pasteboard.changeCount()
             if target then hs.timer.doAfter(0.15,function() if target:isRunning() then hs.eventtap.keyStroke({"cmd"},"v",0,target) end end) end
-            return true,target and "已复制并请求粘贴" or "已复制，请在目标应用手动粘贴"
+            return true,target and i18n.t("已复制并请求粘贴") or i18n.t("已复制，请在目标应用手动粘贴")
         end
     end
-    return false,"记录已过期或被清除"
+    return false,i18n.t("记录已过期或被清除")
 end
-function M.clear() for _,entry in ipairs(M.entries) do remove(entry) end;M.entries={};M.persist();return true,"历史已清空" end
+function M.clear() for _,entry in ipairs(M.entries) do remove(entry) end;M.entries={};M.persist();return true,i18n.t("历史已清空") end
 function M.preview(id)
     M.prune()
     for _,entry in ipairs(M.entries) do
         if entry.id==id and entry.kind=="image" then
             local url=entry.image:encodeAsURLString(true,"PNG")
-            if not url or #url>13981070 then return nil,"图片无法预览或超出容量限制" end
+            if not url or #url>13981070 then return nil,i18n.t("图片无法预览或超出容量限制") end
             return {id=entry.id,time=entry.time,url=url}
         end
     end
-    return nil,"图片已过期或被清除"
+    return nil,i18n.t("图片已过期或被清除")
 end
 function M.snapshot()
     M.prune()
     local entries={}
     for _,entry in ipairs(M.entries) do
-        table.insert(entries,{id=entry.id,kind=entry.kind,time=entry.time,text=entry.text or "图片",preview=entry.thumb and entry.thumb:encodeAsURLString(false,"PNG") or nil})
+        table.insert(entries,{id=entry.id,kind=entry.kind,time=entry.time,text=entry.text or i18n.t("图片"),preview=entry.thumb and entry.thumb:encodeAsURLString(false,"PNG") or nil})
     end
     return {config=M.config,paused=M.paused,entries=entries}
 end
@@ -186,22 +187,22 @@ function M.menuItems()
     M.prune()
     local target=hs.application.frontmostApplication()
     local menu={
-        {title=M.config.enabled and (M.paused and "已暂停记录" or "正在记录") or "历史记录未启用",disabled=true},
-        {title="搜索历史…",fn=function() M.openSettings("history") end},
-        {title=M.paused and "恢复记录" or "暂停记录",disabled=not M.config.enabled,fn=function() M.pause() end},
+        {title=M.config.enabled and (M.paused and i18n.t("已暂停记录") or i18n.t("正在记录")) or i18n.t("历史记录未启用"),disabled=true},
+        {title=i18n.t("搜索历史…"),fn=function() M.openSettings("history") end},
+        {title=M.paused and i18n.t("恢复记录") or i18n.t("暂停记录"),disabled=not M.config.enabled,fn=function() M.pause() end},
         {title="-"},
     }
     for _,entry in ipairs(M.entries) do
-        local text=(entry.text or "图片 "..os.date("%H:%M:%S",math.floor(entry.time))):gsub("[\r\n\t]"," ")
+        local text=(entry.text or i18n.t("图片 ")..os.date("%H:%M:%S",math.floor(entry.time))):gsub("[\r\n\t]"," ")
         local length=utf8.len(text)
         if length and length>40 then text=text:sub(1,utf8.offset(text,41)-1).."…" end
         table.insert(menu,{title=text,image=entry.thumb,fn=function(mods) local ok,message=M.copy(entry.id,mods and mods.alt and target or nil);if not ok then hs.alert.show(message) end end})
     end
-    if #M.entries==0 then table.insert(menu,{title="暂无历史",disabled=true}) end
+    if #M.entries==0 then table.insert(menu,{title=i18n.t("暂无历史"),disabled=true}) end
     table.insert(menu,{title="-"})
-    table.insert(menu,{title="剪贴板设置…",fn=function() M.openSettings("settings") end})
-    table.insert(menu,{title="清空历史…",disabled=#M.entries==0,fn=function()
-        if hs.dialog.blockAlert("清空剪贴板历史？","仅移除此 App 的历史记录和缓存，不改系统当前剪贴板。","清空","取消","warning")=="清空" then M.clear() end
+    table.insert(menu,{title=i18n.t("剪贴板设置…"),fn=function() M.openSettings("settings") end})
+    table.insert(menu,{title=i18n.t("清空历史…"),disabled=#M.entries==0,fn=function()
+        if hs.dialog.blockAlert(i18n.t("清空剪贴板历史？"),i18n.t("仅移除此 App 的历史记录和缓存，不改系统当前剪贴板。"),i18n.t("清空"),i18n.t("取消"),"warning")==i18n.t("清空") then M.clear() end
     end})
     return menu
 end
@@ -215,7 +216,7 @@ function M.showPopup()
 end
 function M.startMenu(openSettings)
     M.openSettings=openSettings
-    M.menu=hs.menubar.new():setTitle("📋"):setTooltip("Nivlet 剪贴板历史")
+    M.menu=hs.menubar.new():setTitle("📋"):setTooltip(i18n.t("Nivlet 剪贴板历史"))
     M.menu:setMenu(M.menuItems)
     M.popup=hs.menubar.new(false):setMenu(M.menuItems)
 end

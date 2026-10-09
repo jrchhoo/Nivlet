@@ -1,3 +1,4 @@
+local i18n = require("modules.i18n")
 local M={rx=0,tx=0,lunar="N/A",mac=nil}
 local settingsKey="desktoptoolkit.system.v1"
 M.fields={"network","cpu","memory","disk","ipv4","ipv6","mac","date","lunar"}
@@ -5,10 +6,10 @@ function M.defaults()
     local config={};for _,field in ipairs(M.fields) do config[field]=true end;return config
 end
 function M.validate(value)
-    if type(value)~="table" then return nil,"系统信息设置格式无效" end
+    if type(value)~="table" then return nil,i18n.t("系统信息设置格式无效") end
     local config={}
     for _,field in ipairs(M.fields) do
-        if type(value[field])~="boolean" then return nil,"系统信息开关格式无效" end
+        if type(value[field])~="boolean" then return nil,i18n.t("系统信息开关格式无效") end
         config[field]=value[field]
     end
     return config
@@ -16,8 +17,12 @@ end
 M.config=M.defaults()
 function M.save(value)
     local config,message=M.validate(value);if not config then return false,message end
-    M.config=config;hs.settings.set(settingsKey,config);M.draw()
-    return true,"系统信息设置已保存"
+    M.config=config;hs.settings.set(settingsKey,config)
+    -- A reused NSMenu can retain the smaller layout after fields are restored.
+    -- Clear it first so AppKit measures a fresh menu on the next opening.
+    M.menu:setMenu(nil):setMenu(M.menuItems)
+    M.draw()
+    return true,i18n.t("系统信息设置已保存")
 end
 function M.speed(bytes)
     if bytes<1024 then return string.format("%.0f B/s",bytes) end
@@ -68,9 +73,9 @@ function M.menuItems()
         for _,address in ipairs(details and details[kind] and details[kind].Addresses or {}) do table.insert(menu,copyItem(kind=="IPv4" and "LAN" or "IPv6",address)) end
     end
     if M.mac then table.insert(menu,copyItem("MAC",M.mac)) end
-    table.insert(menu,{title="WAN / Loc: 未开启外部查询",disabled=true})
+    table.insert(menu,{title=i18n.t("WAN / Loc: 未开启外部查询"),disabled=true})
     table.insert(menu,{title="-"})
-    local weekdays={"周日","周一","周二","周三","周四","周五","周六"}
+    local weekdays={i18n.t("周日"),i18n.t("周一"),i18n.t("周二"),i18n.t("周三"),i18n.t("周四"),i18n.t("周五"),i18n.t("周六")}
     table.insert(menu,{title="Date: "..os.date("%Y-%m-%d").." "..weekdays[os.date("*t").wday],fn=function() hs.pasteboard.setContents(os.date("%Y-%m-%d %H:%M:%S")) end})
     table.insert(menu,copyItem("Lunar",M.lunar))
     local prefixes={CPU="cpu",MEM="memory",Disk="disk",LAN="ipv4",IPv6="ipv6",MAC="mac",Date="date",Lunar="lunar"}
@@ -79,9 +84,9 @@ function M.menuItems()
         local field=prefixes[item.title:match("^(%w+):")]
         if field and M.config[field] then table.insert(filtered,item) end
     end
-    if #filtered==0 then table.insert(filtered,{title="未选择显示信息",disabled=true}) end
+    if #filtered==0 then table.insert(filtered,{title=i18n.t("未选择显示信息"),disabled=true}) end
     table.insert(filtered,{title="-"})
-    table.insert(filtered,{title="系统信息设置…",fn=M.openSettings})
+    table.insert(filtered,{title=i18n.t("系统信息设置…"),fn=M.openSettings})
     return filtered
 end
 function M.draw()
@@ -115,7 +120,7 @@ function M.start(openSettings)
         local c=cpu.overall
         M.cpuPrevious={active=c.user+c.nice+c.system,total=c.user+c.nice+c.system+c.idle}
     end
-    M.menu=hs.menubar.new():setTitle("▲ — / ▼ —"):setTooltip("Nivlet 系统信息")
+    M.menu=hs.menubar.new():setTitle("▲ — / ▼ —"):setTooltip(i18n.t("Nivlet 系统信息"))
     M.menu:setMenu(M.menuItems)
     M.draw();M.scan();M.timer=hs.timer.doEvery(2,M.scan)
 end

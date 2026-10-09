@@ -9,7 +9,7 @@ hs = {
     hotkey={assignable=function(_,k) return k ~= "9" end,systemAssigned=function() return false end,
         bind=function(_,k,fn) callbacks[k]=fn; return {delete=function() callbacks[k]=nil end} end},
 }
-package.loaded["modules.sys_info"]={start=function() end}
+package.loaded["modules.sys_info"]={start=function() end,menu=menu(),menuItems=function() return {} end}
 dofile("Toolkit/init.lua")
 assert(#desktopToolkit.bindings==0)
 local old={enabled=true,shortcuts={left={key="1",mods={"ctrl","alt","cmd","shift"}}}}
@@ -43,3 +43,12 @@ hs.dockIconClickCallback()
 assert(opened=="generalSection")
 desktopToolkit.openSettings=original
 print("General settings validation, persistence and reopen dispatch passed")
+
+assert(desktopToolkit.general.language=="system")
+assert(not desktopToolkit.saveGeneral({showMenu=true,appearance="system",language="fr"}))
+assert(desktopToolkit.saveGeneral({showMenu=true,appearance="system",language="en"}))
+assert(require("modules.i18n").t("设置…")=="Settings…")
+assert(stored["desktoptoolkit.general.v1"].language=="en")
+assert(desktopToolkit.saveGeneral({showMenu=true,appearance="system",language="zh-Hans"}))
+assert(require("modules.i18n").t("设置…")=="设置…")
+print("Language validation, persistence and immediate switching passed")
