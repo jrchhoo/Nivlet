@@ -1,6 +1,6 @@
 # Nivlet 当前基准与续开发入口
 
-> 2026-10-10 后续核查发现原脚本漏收 LICENSE.SimplePing、LICENSE.timeout3 和 LICENSE-examples。收集规则已修复并补回归，现收集 81 个许可文件；补充原文见 [THIRD-PARTY-SUPPLEMENT.md](THIRD-PARTY-SUPPLEMENT.md)。当前安装版与 rc.5 附件仍为原声明，尚未重新打包；不能将此前“文件一致”解读为声明完整。
+> 2026-10-10 后续核查发现原脚本漏收 LICENSE.SimplePing、LICENSE.timeout3 和 LICENSE-examples。收集规则已修复并补回归，现收集 81 个许可文件；补充原文见 [THIRD-PARTY-SUPPLEMENT.md](THIRD-PARTY-SUPPLEMENT.md)。补充声明已作为 rc.5 独立附件发布，发布说明已同步更新；当前安装版及原 DMG/ZIP 仍为原声明，尚未重新打包；不能将此前“文件一致”解读为声明完整。
 
 
 更新日期：2026-10-10。本文是当前状态入口；阶段记录中的旧版本、待验收状态均指当时，不覆盖本页结论。
