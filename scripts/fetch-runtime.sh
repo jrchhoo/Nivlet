@@ -27,3 +27,5 @@ git -C "$upstream_dir" apply "$project_dir/patches/browser-background.patch"
 git -C "$upstream_dir" apply "$project_dir/patches/dock-settings-lifecycle.patch"
 
 git -C "$upstream_dir" apply "$project_dir/patches/settings-title-icon.patch"
+
+git -C "$upstream_dir" apply "$project_dir/patches/nivlet-updater.patch"

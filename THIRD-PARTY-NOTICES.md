@@ -2,6 +2,8 @@
 
 Runtime patches modify Hammerspoon 1.1.1, commit 1469832361b4c3687ec7d589c1b4efe4d3b742ee. The following upstream notice is retained. Runtime dependencies are downloaded separately and retain their original notices; a binary release requires a complete dependency notices audit.
 
+Nivlet’s active updater embeds Sparkle 2.10.0 from the official distribution (https://github.com/sparkle-project/Sparkle/releases/tag/2.10.0), replacing the Runtime’s bundled 2.6.4 framework. Its complete license is appended by the packaging script.
+
 The MIT License (MIT)
 
 Copyright (c) 2014-2025 [Various Contributors](https://github.com/Hammerspoon/hammerspoon/graphs/contributors)

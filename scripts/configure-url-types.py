@@ -13,6 +13,12 @@ if not re.fullmatch(r'\d+\.\d+\.\d+', version) or not re.fullmatch(r'[1-9]\d*', 
     raise SystemExit('Invalid Nivlet version or NIVLET_BUILD_NUMBER')
 info['CFBundleShortVersionString'] = version
 info['CFBundleVersion'] = build
+info['SUFeedURL'] = 'https://wivnelo.github.io/Nivlet/appcast.xml'
+info['SUPublicEDKey'] = 'BZOLe5gdPobi3DhB5l13XFopkGgkPP/V6I/kzY3YXKg='
+info['SUEnableAutomaticChecks'] = False
+info['SUAutomaticallyUpdate'] = False
+info['SUEnableSystemProfiling'] = False
+info['SUVerifyUpdateBeforeExtraction'] = True
 info['CFBundleURLTypes'] = [{
     'CFBundleURLName': 'dev.local.DesktopToolkit.web',
     'CFBundleTypeRole': 'Viewer',
