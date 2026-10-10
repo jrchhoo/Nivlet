@@ -1,6 +1,6 @@
 # Nivlet for Mac 1.0.0 候选版说明
 
-> 当前状态（2026-10-10）：正式版 1.0.0 / Build 18，本机与 GitHub 发布附件一致。续开发以 [BASELINE.md](BASELINE.md) 和 [ROADMAP.md](ROADMAP.md) 为准。下文旧构建的“当前”、待办和未安装描述均为当时记录，不代表最新状态。
+> 当前状态（2026-10-10）：正式版 1.0.0 / Build 18，本机与 GitHub 发布附件一致。续开发以 [BASELINE.md](../../BASELINE.md) 和 [ROADMAP.md](../../ROADMAP.md) 为准。下文旧构建的“当前”、待办和未安装描述均为当时记录，不代表最新状态。
 
 ## 最新基准：1.0.0 / Build 18（2026-10-10）
 
@@ -14,7 +14,7 @@ Build 16 → 18 的真实更新已使 /Applications/Nivlet.app 运行 Build 18�
 
 用户决定暂不考虑 App Store，采用无需付费账号的 GitHub 正式发行路线。v1.0.0 使用应用 1.0.0 / Build 14，功能与已验收 Build 13 一致，包内补齐 81 份许可文件；rc.5 保留历史。本机 /Applications/Nivlet.app 继续保留 Build 13，不替换、不重签名，不修改个人配置。
 
-GitHub 正式发行状态与 Apple 信任链独立：Build 14 仍为 ad-hoc，未 Developer ID 签名、未公证，首次下载/Gatekeeper、Intel、其他机器与多屏仍未全面验证。完整许可法律审查不能由自动收集替代。Build 14 完整 Release 构建、全部 Lua 回归、许可原文回归、原生 Dock 与按键测试通过；104 个 Mach-O 均含双架构，严格签名、ZIP CRC、DMG 和 SHA-256 通过。未启动或安装 Build 14。正式发布说明见 [RELEASE-v1.0.0.md](RELEASE-v1.0.0.md)。以下旧状态为历史记录。
+GitHub 正式发行状态与 Apple 信任链独立：Build 14 仍为 ad-hoc，未 Developer ID 签名、未公证，首次下载/Gatekeeper、Intel、其他机器与多屏仍未全面验证。完整许可法律审查不能由自动收集替代。Build 14 完整 Release 构建、全部 Lua 回归、许可原文回归、原生 Dock 与按键测试通过；104 个 Mach-O 均含双架构，严格签名、ZIP CRC、DMG 和 SHA-256 通过。未启动或安装 Build 14。正式发布说明见 [RELEASE-v1.0.0.md](../RELEASE-v1.0.0.md)。以下旧状态为历史记录。
 
 
 
@@ -26,7 +26,7 @@ GitHub 正式发行状态与 Apple 信任链独立：Build 14 仍为 ad-hoc，�
 
 当前已发布 **v1.0.0-rc.5 / 应用 1.0.0 / Build 13（Release）**，提交 `44267c6`。本机安装与公开附件一致；最终辅助功能与 TG→Chrome 无闪现验收通过。仍为 ad-hoc 预发布候选，未完成公证和跨机器验收。
 
-当前状态、清理结果及后续优先级以 [BASELINE.md](BASELINE.md) 为准；下方按日期保留阶段证据，旧的待验描述不表示当前仍开放。
+当前状态、清理结果及后续优先级以 [BASELINE.md](../../BASELINE.md) 为准；下方按日期保留阶段证据，旧的待验描述不表示当前仍开放。
 
 ## 包含的功能
 
@@ -66,7 +66,7 @@ GitHub 正式发行状态与 Apple 信任链独立：Build 14 仍为 ad-hoc，�
 
 安装时将 Nivlet.app 拖入 Applications。升级只替换 App，保留数据目录；开发签名变更可能要求重新授权辅助功能。所有可编辑设置在窗口右下角保存，权限检测和历史操作即时执行。来源应用分流需将 macOS 默认网页浏览器选为 Nivlet。
 
-`VERSION` 为产品版本来源，`NIVLET_BUILD_NUMBER` 指定 build。重现本机 Build 4 使用 `NIVLET_BUILD_NUMBER=4 sh scripts/build-release.sh`，再运行 `NIVLET_BUILD_CONFIGURATION=Release sh scripts/package-local.sh`（完整 Xcode 环境按 DEVELOPMENT.md 设置）。详细流程见 [DEVELOPMENT.md](DEVELOPMENT.md)。
+`VERSION` 为产品版本来源，`NIVLET_BUILD_NUMBER` 指定 build。重现本机 Build 4 使用 `NIVLET_BUILD_NUMBER=4 sh scripts/build-release.sh`，再运行 `NIVLET_BUILD_CONFIGURATION=Release sh scripts/package-local.sh`（完整 Xcode 环境按 DEVELOPMENT.md 设置）。详细流程见 [DEVELOPMENT.md](../DEVELOPMENT.md)。
 
 ## Build 4 阶段补记（2026-10-09）
 

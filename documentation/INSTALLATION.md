@@ -19,7 +19,7 @@
 把 ZIP、DMG 及同版本的 .sha256 文件放在同一文件夹，在该文件夹运行：
 
 ```sh
-shasum -a 256 -c Nivlet-1.0.0-build13-x86_64-arm64-local-release.sha256
+shasum -a 256 -c Nivlet-1.0.0-build18-x86_64-arm64-local-release.sha256
 ```
 
 两个安装包都在时应各显示 OK；缺少其中一个会报该文件不存在，不代表另一个损坏。校验文件检测传输一致性，不替代 Apple 签名公证。
@@ -50,7 +50,7 @@ shasum -a 256 -c Nivlet-1.0.0-build13-x86_64-arm64-local-release.sha256
 - 关于页更新通道、官网与捐赠尚未接入；新版本暂通过 GitHub Releases 手动获取。
 - 报告问题请提供应用版本/Build、macOS、芯片、操作步骤与提示；不要上传敏感剪贴板内容、完整私人配置或凭据。
 
-现有模块使用方式见 [README](README.md)，当前验证状态见 [BASELINE](BASELINE.md)，工程验收见 [DISTRIBUTION](DISTRIBUTION.md)。
+现有模块使用方式见 [README](../README.md)，当前验证状态见 [BASELINE](../BASELINE.md)，工程验收见 [DISTRIBUTION](DISTRIBUTION.md)。
 
 ## 应用内更新（Build 18 起）
 

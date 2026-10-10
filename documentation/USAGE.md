@@ -1,6 +1,6 @@
 # Nivlet 使用指南
 
-[返回首页](README.md) · [English](USAGE.en.md)
+[返回首页](../README.md) · [English](USAGE.en.md)
 
 ## 使用说明
 

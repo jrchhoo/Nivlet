@@ -45,7 +45,7 @@ Nivlet is a free, open-source macOS menu bar utility that brings everyday deskto
 
 Features are opt-in, and shortcuts are yours to configure. Window management and Option-click paste require **Accessibility permission**. Browser routing requires choosing **Nivlet as your default browser**.
 
-> **Installation note:** This release has no Developer ID signature or Apple notarization; macOS may block first launch. See the [installation, upgrade and removal guide](INSTALLATION.md) (Chinese). Declared minimum: macOS 13.0. The package includes Apple Silicon and Intel architectures; Intel, other macOS versions and multiple displays have not been fully validated.
+> **Installation note:** This release has no Developer ID signature or Apple notarization; macOS may block first launch. See the [installation, upgrade and removal guide](documentation/INSTALLATION.md) (Chinese). Declared minimum: macOS 13.0. The package includes Apple Silicon and Intel architectures; Intel, other macOS versions and multiple displays have not been fully validated.
 
 ## Local processing, optional recording
 
@@ -57,9 +57,9 @@ Check for signed updates in About, then confirm to download, install and restart
 
 ## Learn more
 
-- [User guide](USAGE.en.md) · [Configuration import/export](CONFIGURATION.md) (Chinese)
+- [User guide](documentation/USAGE.en.md) · [Configuration import/export](documentation/CONFIGURATION.md) (Chinese)
 - [Releases](https://github.com/wivnelo/Nivlet/releases) · [Roadmap](ROADMAP.md) (Chinese)
-- [Development & building](DEVELOPMENT.md) (Chinese)
+- [Development & building](documentation/DEVELOPMENT.md) (Chinese)
 
 Report problems or suggestions through [GitHub Issues](https://github.com/wivnelo/Nivlet/issues). Include the app version, macOS version and reproduction steps. Do not upload sensitive clipboard contents, personal configurations or credentials.
 

@@ -45,7 +45,7 @@ Nivlet 是一款免费开源的 macOS 菜单栏工具，将常用操作放在一
 
 功能按需开启，快捷键由你配置。窗口管理和 Option 直接粘贴需要**辅助功能权限**；浏览器分流需要将 **Nivlet 设为默认浏览器**。
 
-> **安装提示：**当前版本尚未经过 Developer ID 签名与 Apple 公证，macOS 可能阻止首次打开。请查看 [安装、升级与卸载指南](INSTALLATION.md)。最低声明 macOS 13.0；安装包包含 Apple Silicon 与 Intel 架构，Intel、其他 macOS 和多屏兼容性尚未全面验证。
+> **安装提示：**当前版本尚未经过 Developer ID 签名与 Apple 公证，macOS 可能阻止首次打开。请查看 [安装、升级与卸载指南](documentation/INSTALLATION.md)。最低声明 macOS 13.0；安装包包含 Apple Silicon 与 Intel 架构，Intel、其他 macOS 和多屏兼容性尚未全面验证。
 
 关于页提供官网与“检查更新…”：发现新版后确认安装，自动下载、校验并重启。
 
@@ -57,9 +57,9 @@ Nivlet 是一款免费开源的 macOS 菜单栏工具，将常用操作放在一
 
 ## 了解更多
 
-- [使用指南](USAGE.md) · [配置导入导出](CONFIGURATION.md)
+- [使用指南](documentation/USAGE.md) · [配置导入导出](documentation/CONFIGURATION.md)
 - [版本记录](https://github.com/wivnelo/Nivlet/releases) · [开发计划](ROADMAP.md)
-- [开发与构建](DEVELOPMENT.md)
+- [开发与构建](documentation/DEVELOPMENT.md)
 
 遇到问题或有建议，请提交 [GitHub Issue](https://github.com/wivnelo/Nivlet/issues)，附上应用版本、macOS 版本与复现步骤。请勿上传敏感剪贴板、私人配置或凭据。
 

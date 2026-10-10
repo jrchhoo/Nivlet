@@ -1,18 +1,8 @@
-# Nivlet for Mac 分发准备与验收
+# 分发历史记录
 
-## 当前工程基准（2026-10-10）
+> 历史参考，不代表当前基准；当前入口见 [BASELINE](../../BASELINE.md)。
 
-正式版为 1.0.0 / Build 18，已安装并发布；当前状态以 [BASELINE.md](BASELINE.md) 为准。下面旧构建阶段的状态、命令及待办保留为历史参考。
 
-- Runtime 固定来源；构建通过 `scripts/prepare-updater.sh` 准备固定 Sparkle 2.10.0，许可收集包含其原文。
-- Release 构建使用完整 Xcode：`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=19 sh scripts/build-release.sh`。19 仅为下一构建示例，实际发布前核对并递增；构建不自动安装。
-- 更新入口位于关于页，原生 Sparkle 桥接由 `patches/nivlet-updater.patch` 注入；有草稿先处理，默认手动检查、用户确认安装。
-- Feed 为 `docs/appcast.xml`，使用 `scripts/generate-update-feed.py <ZIP>` 生成、`tests/updates.py` 验证。Ed25519 私钥留 Keychain，不导出到源码、日志或安装包。
-- 发布顺序：新版本/Build → 构建和回归 → 打包/签名校验 → 上传新附件 → 发布 feed → 实测升级及最新检查 → 保留回滚备份。
-- 当前 v1.0.0 附件更新为 Build 18；历史 tag 未重写，GitHub 自动源码归档仍对应原 tag。Build 18 更新实现源码见 main 的 `b0ed084` 及后续文档提交。下一功能版本使用新 tag，避免继续产生源码归档与附件版本差异。
-- 本机真实 16 → 18 更新已通过；完整更新异常、其他硬件/macOS及公证仍有待验项，见 [ROADMAP.md](ROADMAP.md)。GitHub 正式发布与 Apple 信任链分别描述。
-
-## 历史工程记录与参考清单
 
 ## Build 18 更新通道
 
@@ -31,7 +21,7 @@ python3 tests/updates.py
 
 用户决定暂不考虑 App Store，采用无需付费账号的 GitHub 正式发行路线。v1.0.0 使用应用 1.0.0 / Build 14，功能与已验收 Build 13 一致，包内补齐 81 份许可文件；rc.5 保留历史。本机 /Applications/Nivlet.app 继续保留 Build 13，不替换、不重签名，不修改个人配置。
 
-GitHub 正式发行状态与 Apple 信任链独立：Build 14 仍为 ad-hoc，未 Developer ID 签名、未公证，首次下载/Gatekeeper、Intel、其他机器与多屏仍未全面验证。完整许可法律审查不能由自动收集替代。Build 14 完整 Release 构建、全部 Lua 回归、许可原文回归、原生 Dock 与按键测试通过；104 个 Mach-O 均含双架构，严格签名、ZIP CRC、DMG 和 SHA-256 通过。未启动或安装 Build 14。正式发布说明见 [RELEASE-v1.0.0.md](RELEASE-v1.0.0.md)。以下旧状态为历史记录。
+GitHub 正式发行状态与 Apple 信任链独立：Build 14 仍为 ad-hoc，未 Developer ID 签名、未公证，首次下载/Gatekeeper、Intel、其他机器与多屏仍未全面验证。完整许可法律审查不能由自动收集替代。Build 14 完整 Release 构建、全部 Lua 回归、许可原文回归、原生 Dock 与按键测试通过；104 个 Mach-O 均含双架构，严格签名、ZIP CRC、DMG 和 SHA-256 通过。未启动或安装 Build 14。正式发布说明见 [RELEASE-v1.0.0.md](../RELEASE-v1.0.0.md)。以下旧状态为历史记录。
 
 
 > 2026-10-10 后续核查发现原脚本漏收 LICENSE.SimplePing、LICENSE.timeout3 和 LICENSE-examples。收集规则已修复并补回归，现收集 81 个许可文件；补充原文见 [THIRD-PARTY-SUPPLEMENT.md](THIRD-PARTY-SUPPLEMENT.md)。补充声明已作为 rc.5 独立附件发布，发布说明已同步更新；当前安装版及原 DMG/ZIP 仍为原声明，尚未重新打包；不能将此前“文件一致”解读为声明完整。
@@ -44,14 +34,14 @@ GitHub 正式发行状态与 Apple 信任链独立：Build 14 仍为 ad-hoc，�
 
 用户补充登录自启动目前暂无明显问题，要求暂不继续排查；从当前阻塞项移至观察，复发再收集证据。没有单独的注销登录测试记录，不将其写成已独立验证全部登录场景。当前 rc.5 / Build 13 作为冻结预发布基准继续使用，GitHub 已发布，无需重打包或重复发布相同二进制。
 
-> 当前基准为已发布的 v1.0.0-rc.5 / Build 13；最新状态与下一步见 [BASELINE.md](BASELINE.md)。以下阶段记录保留当时状态。
+> 当前基准为已发布的 v1.0.0-rc.5 / Build 13；最新状态与下一步见 [BASELINE.md](../../BASELINE.md)。以下阶段记录保留当时状态。
 
 
 本清单区分免费可完成的工程准备和需要 Apple Developer Program 的正式分发步骤。GitHub 测试包不等于已通过 Apple 公证的稳定版。
 
 ## 免费准备当前结果
 
-已补齐 [安装、升级与卸载指南](INSTALLATION.md)；Build 13 的声明一致性、ZIP 路径筛查、101 个 Mach-O 架构及严格签名复核通过，详见 [许可工程核查](THIRD-PARTY-AUDIT.md)。首次下载/Gatekeeper、完整特殊许可条款、跨机器兼容性仍开放。无需重打包或替换当前应用。
+已补齐 [安装、升级与卸载指南](../INSTALLATION.md)；Build 13 的声明一致性、ZIP 路径筛查、101 个 Mach-O 架构及严格签名复核通过，详见 [许可工程核查](../THIRD-PARTY-AUDIT.md)。首次下载/Gatekeeper、完整特殊许可条款、跨机器兼容性仍开放。无需重打包或替换当前应用。
 
 ## 无付费账号的本地构建
 

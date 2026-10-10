@@ -19,7 +19,7 @@
 
 下载 DMG，将 Nivlet.app 拖入 Applications；无需单独安装 Hammerspoon。升级前保存草稿并导出配置，退出旧应用后替换 App。窗口管理与 Option 直接粘贴需要辅助功能；浏览器分流需要主动将 Nivlet 设为默认浏览器。
 
-**本包仍为 ad-hoc 签名，未 Developer ID 签名及 Apple 公证，macOS 可能阻止首次打开。** 请按 [安装指南](https://github.com/wivnelo/Nivlet/blob/main/INSTALLATION.md) 操作，不要全局关闭 Gatekeeper。
+**本包仍为 ad-hoc 签名，未 Developer ID 签名及 Apple 公证，macOS 可能阻止首次打开。** 请按 [安装指南](https://github.com/wivnelo/Nivlet/blob/main/documentation/INSTALLATION.md) 操作，不要全局关闭 Gatekeeper。
 
 二进制包含 arm64 与 x86_64；本机 Apple Silicon 已有使用证据，Intel、其他 macOS、跨机器及多屏未全面验证。最低声明 macOS 13.0。配置与剪贴板保存在本机。
 

@@ -1,30 +1,20 @@
-# 开发与构建
+# 开发构建历史记录
 
-## 当前工程基准（2026-10-10）
+> 历史参考，不代表当前基准；当前入口见 [BASELINE](../../BASELINE.md)。
 
-正式版为 1.0.0 / Build 18，已安装并发布；当前状态以 [BASELINE.md](BASELINE.md) 为准。下面旧构建阶段的状态、命令及待办保留为历史参考。
 
-- Runtime 固定来源；构建通过 `scripts/prepare-updater.sh` 准备固定 Sparkle 2.10.0，许可收集包含其原文。
-- Release 构建使用完整 Xcode：`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=19 sh scripts/build-release.sh`。19 仅为下一构建示例，实际发布前核对并递增；构建不自动安装。
-- 更新入口位于关于页，原生 Sparkle 桥接由 `patches/nivlet-updater.patch` 注入；有草稿先处理，默认手动检查、用户确认安装。
-- Feed 为 `docs/appcast.xml`，使用 `scripts/generate-update-feed.py <ZIP>` 生成、`tests/updates.py` 验证。Ed25519 私钥留 Keychain，不导出到源码、日志或安装包。
-- 发布顺序：新版本/Build → 构建和回归 → 打包/签名校验 → 上传新附件 → 发布 feed → 实测升级及最新检查 → 保留回滚备份。
-- 当前 v1.0.0 附件更新为 Build 18；历史 tag 未重写，GitHub 自动源码归档仍对应原 tag。Build 18 更新实现源码见 main 的 `b0ed084` 及后续文档提交。下一功能版本使用新 tag，避免继续产生源码归档与附件版本差异。
-- 本机真实 16 → 18 更新已通过；完整更新异常、其他硬件/macOS及公证仍有待验项，见 [ROADMAP.md](ROADMAP.md)。GitHub 正式发布与 Apple 信任链分别描述。
-
-## 历史工程记录与参考清单
 
 ## GitHub 1.0.0 发行基准（2026-10-10）
 
 用户决定暂不考虑 App Store，采用无需付费账号的 GitHub 正式发行路线。v1.0.0 使用应用 1.0.0 / Build 14，功能与已验收 Build 13 一致，包内补齐 81 份许可文件；rc.5 保留历史。本机 /Applications/Nivlet.app 继续保留 Build 13，不替换、不重签名，不修改个人配置。
 
-GitHub 正式发行状态与 Apple 信任链独立：Build 14 仍为 ad-hoc，未 Developer ID 签名、未公证，首次下载/Gatekeeper、Intel、其他机器与多屏仍未全面验证。完整许可法律审查不能由自动收集替代。Build 14 完整 Release 构建、全部 Lua 回归、许可原文回归、原生 Dock 与按键测试通过；104 个 Mach-O 均含双架构，严格签名、ZIP CRC、DMG 和 SHA-256 通过。未启动或安装 Build 14。正式发布说明见 [RELEASE-v1.0.0.md](RELEASE-v1.0.0.md)。以下旧状态为历史记录。
+GitHub 正式发行状态与 Apple 信任链独立：Build 14 仍为 ad-hoc，未 Developer ID 签名、未公证，首次下载/Gatekeeper、Intel、其他机器与多屏仍未全面验证。完整许可法律审查不能由自动收集替代。Build 14 完整 Release 构建、全部 Lua 回归、许可原文回归、原生 Dock 与按键测试通过；104 个 Mach-O 均含双架构，严格签名、ZIP CRC、DMG 和 SHA-256 通过。未启动或安装 Build 14。正式发布说明见 [RELEASE-v1.0.0.md](../RELEASE-v1.0.0.md)。以下旧状态为历史记录。
 
 
-> 当前基准为已发布的 v1.0.0-rc.5 / Build 13；最新状态与下一步见 [BASELINE.md](BASELINE.md)。以下阶段记录保留当时状态。
+> 当前基准为已发布的 v1.0.0-rc.5 / Build 13；最新状态与下一步见 [BASELINE.md](../../BASELINE.md)。以下阶段记录保留当时状态。
 
 
-面向修改源码或自行构建的开发者。日常使用见 [README](README.md)。
+面向修改源码或自行构建的开发者。日常使用见 [README](../../README.md)。
 
 ## 本地构建
 
@@ -66,7 +56,7 @@ git diff --check
 - 当前设置内容使用 WebView，并非完整 AppKit 控件实现。
 - 运行构建版和安装版时先核实实际进程路径，避免重复实例；替换前注意未持久化的剪贴板历史会随退出丢失。
 - ad-hoc 签名变化可能要求重新授予辅助功能权限，仅操作 Nivlet 的权限条目。
-- 分项证据和未验证流程见 [VALIDATION.md](VALIDATION.md)，以最新日期章节为准。
+- 分项证据和未验证流程见 [VALIDATION.md](../VALIDATION.md)，以最新日期章节为准。
 
 ## 发布前仍需完成
 
@@ -89,7 +79,7 @@ NIVLET_BUILD_NUMBER=4 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer s
 NIVLET_BUILD_CONFIGURATION=Release sh scripts/package-local.sh
 ```
 
-产物位于 `build/DerivedData/Build/Products/Release/Nivlet.app`，安装包名称带 `-release`，与 Debug 包区分。正式签名、公证及测试者验收见 [分发准备](DISTRIBUTION.md)，许可核查见 [第三方许可工程核查](THIRD-PARTY-AUDIT.md)。
+产物位于 `build/DerivedData/Build/Products/Release/Nivlet.app`，安装包名称带 `-release`，与 Debug 包区分。正式签名、公证及测试者验收见 [分发准备](../DISTRIBUTION.md)，许可核查见 [第三方许可工程核查](../THIRD-PARTY-AUDIT.md)。
 
 ## 开发与发布顺序（2026-10-10）
 

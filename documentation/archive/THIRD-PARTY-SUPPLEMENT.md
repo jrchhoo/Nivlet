@@ -1,6 +1,6 @@
 # Build 13 第三方声明补充 / Third-party notice supplement
 
-> 当前状态（2026-10-10）：正式版 1.0.0 / Build 18，本机与 GitHub 发布附件一致。续开发以 [BASELINE.md](BASELINE.md) 和 [ROADMAP.md](ROADMAP.md) 为准。下文旧构建的“当前”、待办和未安装描述均为当时记录，不代表最新状态。
+> 当前状态（2026-10-10）：正式版 1.0.0 / Build 18，本机与 GitHub 发布附件一致。续开发以 [BASELINE.md](../../BASELINE.md) 和 [ROADMAP.md](../../ROADMAP.md) 为准。下文旧构建的“当前”、待办和未安装描述均为当时记录，不代表最新状态。
 
 本补充针对 rc.5 / Build 13 历史遗漏；当前 Build 18 已将补充许可纳入包内，无需另行安装本文件。
 
