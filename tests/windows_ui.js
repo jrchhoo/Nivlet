@@ -14,10 +14,10 @@ window.runWindowsRegression=function(data){
         for(const input of document.querySelectorAll('[data-shortcut-key]'))input.value='';
         left.value='Z';group.value='grid';group.dispatchEvent(new Event('change'));
         grid.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowDown',ctrlKey:true,altKey:true,bubbles:true,cancelable:true}));
-        check(grid.value==='down','Grid shortcut did not capture arrow');
+        check(grid.value==='↓','Grid shortcut did not capture arrow');
         let captured;send=value=>{captured=value};document.getElementById('save').click();
         check(Object.keys(captured.config.shortcuts).length===29,'Save omitted hidden groups');
-        check(captured.config.shortcuts.left.key==='Z'&&captured.config.shortcuts.grid9.key==='down','Draft lost across groups');
+        check(captured.config.shortcuts.left.key==='Z'&&captured.config.shortcuts.grid9.key==='↓','Draft lost across groups');
         check(captured.config.shortcuts.grid9.mods.join('+')==='ctrl+alt','Grid modifiers not captured');
         window.receive({...data,ok:true,action:'refreshClipboard',language:'en'});
         check(group.options[0].textContent==='Basic Layouts'&&group.options[3].textContent==='Nine-cell Grid','Group options not translated');

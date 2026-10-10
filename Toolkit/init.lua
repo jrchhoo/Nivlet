@@ -48,9 +48,9 @@ function app.saveGeneral(value)
     local config, message = validateGeneral(value)
     if not config then return false, message end
     if config.sleepShortcut then
-        for _,shortcut in pairs(app.config and app.config.shortcuts or {}) do if sleep.matches(shortcut) then return false,i18n.t("Command+L 与已有快捷键冲突") end end
-        if sleep.matches(app.popupShortcut) then return false,i18n.t("Command+L 与已有快捷键冲突") end
-        for _,rule in ipairs(launcher.config.rules) do if sleep.matches(rule.shortcut) then return false,i18n.t("Command+L 与已有快捷键冲突") end end
+        for _,shortcut in pairs(app.config and app.config.shortcuts or {}) do if sleep.matches(shortcut) then return false,i18n.t("Command + L 与已有快捷键冲突") end end
+        if sleep.matches(app.popupShortcut) then return false,i18n.t("Command + L 与已有快捷键冲突") end
+        for _,rule in ipairs(launcher.config.rules) do if sleep.matches(rule.shortcut) then return false,i18n.t("Command + L 与已有快捷键冲突") end end
     end
     local installed,result=sleep.configure(config.sleepShortcut)
     if not installed then return false,result end
@@ -64,7 +64,7 @@ function app.saveGeneral(value)
     app.general=config
     i18n.configure(config.language)
     if app.updateMenu then app.updateMenu() end
-    if app.settings then app.settings:windowTitle(i18n.t("Nivlet 设置")) end
+    if app.settings then app.settings:windowTitle("Nivlet for Mac") end
     clipboard.menu:setTooltip(i18n.t("Nivlet 剪贴板历史"))
     system.menu:setTooltip(i18n.t("Nivlet 系统信息")):setMenu(nil):setMenu(system.menuItems)
     hs.settings.set(generalKey,config)
@@ -105,7 +105,7 @@ end
 function app.savePopup(value)
     local shortcut, message = normalizePopup(value)
     if message then return false,message end
-    if sleep.conflicts(shortcut) then return false,i18n.t("Command+L 与已有快捷键冲突") end
+    if sleep.conflicts(shortcut) then return false,i18n.t("Command + L 与已有快捷键冲突") end
     if launcher.conflicts(shortcut) then return false,i18n.t("快捷键与应用启动配置重复") end
     if popupConflicts(shortcut, app.config) then return false,i18n.t("剪贴板快捷键与窗口管理配置重复") end
     if not (sameShortcut(shortcut, app.popupShortcut) and app.popupBinding) then
@@ -166,9 +166,9 @@ end
 function app.save(value)
     local config, message = preferences.validate(value)
     if not config then return false, message end
-    for _,shortcut in pairs(config.shortcuts) do if sleep.conflicts(shortcut) then return false,i18n.t("Command+L 与已有快捷键冲突") end;if launcher.conflicts(shortcut) then return false,i18n.t("快捷键与应用启动配置重复") end end
+    for _,shortcut in pairs(config.shortcuts) do if sleep.conflicts(shortcut) then return false,i18n.t("Command + L 与已有快捷键冲突") end;if launcher.conflicts(shortcut) then return false,i18n.t("快捷键与应用启动配置重复") end end
     if popupConflicts(app.popupShortcut, config) then return false,i18n.t("窗口快捷键与剪贴板菜单配置重复") end
-    if config.enabled and not hs.accessibilityState() then return false, i18n.t("请先在系统设置开启 Nivlet 的辅助功能权限") end
+    if config.enabled and not hs.accessibilityState() then return false, i18n.t("请在通用设置中检查并开启辅助功能权限") end
     clearBindings()
     local ok, errorMessage = install(config)
     if not ok then install(app.config); return false, errorMessage end
@@ -230,6 +230,7 @@ local function reply(ok, message, action)
     if app.settings then app.settings:evaluateJavaScript("window.receive(" .. hs.json.encode({ok=ok,message=message,action=action,language=i18n.language(),translations=i18n.dictionary,general=app.general,launcher=launcher.config,config=app.config,input=input.config,sources=input.sources(),clipboard=clipboard.snapshot(),popupShortcut=app.popupShortcut or false,system=system.config,browser=browser.config,browserStatus=browser.status(),browsers=browser.installed(),accessibility=permission.accessibility=="granted",permissions=permission,autoLaunch=hs.autoLaunch(),about=about.snapshot()}) .. ")") end
 end
 local function showSettingsWindow(view)
+    hs.dockicon.show()
     view:level(hs.drawing.windowLevels.normal):show()
     local window=view:hswindow()
     if window then
@@ -255,6 +256,22 @@ function app.openSettings(section, focus)
         if body.action=="openProjectLink" then
             local links={project="https://github.com/jrchhoo/Nivlet",issues="https://github.com/jrchhoo/Nivlet/issues",releases="https://github.com/jrchhoo/Nivlet/releases",license="https://github.com/jrchhoo/Nivlet/blob/main/LICENSE"}
             if links[body.link] then hs.urlevent.openURL(links[body.link]) end
+        end
+        if body.action=="setDefaultBrowser" then
+            browser.requestDefault()
+            reply(true,i18n.t("请完成系统确认，再点击重新检测；若未出现确认，请打开系统设置。"),body.action)
+            return
+        end
+        if body.action=="refreshBrowserStatus" then reply(true,"",body.action);return end
+        if body.action=="openDefaultBrowserSettings" then
+            local ok=browser.openDefaultSettings()
+            reply(ok,ok and "" or i18n.t("无法打开系统设置，请手动打开桌面与程序坞。"),body.action)
+            return
+        end
+        if body.action=="openLoginSettings" then
+            local ok=permissions.openLoginSettings()
+            reply(ok,ok and "" or i18n.t("无法打开登录项设置，请手动打开系统设置"),body.action)
+            return
         end
         if body.action=="refreshPermissions" then
             local state=permissionState().accessibility
@@ -340,7 +357,9 @@ function app.openSettings(section, focus)
                 if info and info.CFBundleIdentifier then
                     local value = {bundleID=info.CFBundleIdentifier,name=info.CFBundleDisplayName or info.CFBundleName or info.CFBundleIdentifier}
                     local callback=body.action=="chooseLauncherApp" and "window.addLauncherRule(" or body.action=="chooseBrowserApp" and "window.addBrowserAppRule(" or "window.addInputRule("
-                    app.settings:evaluateJavaScript(callback .. hs.json.encode(value) .. ")")
+                    if body.action=="chooseLauncherApp" and type(body.replaceBundleID)=="string" then
+                        app.settings:evaluateJavaScript("window.replaceLauncherApp("..hs.json.encode(value)..","..hs.json.encode({body.replaceBundleID}).."[0])")
+                    else app.settings:evaluateJavaScript(callback .. hs.json.encode(value) .. ")") end
                 else reply(false, i18n.t("无法识别所选应用")) end
             end
         end
@@ -348,8 +367,9 @@ function app.openSettings(section, focus)
     local file = assert(io.open(root .. "settings.html", "r"))
     local html = file:read("*a"); file:close()
     app.settings = hs.webview.new({x=180,y=160,w=980,h=720}, {}, app.controller)
-        :windowStyle({"titled","closable","resizable"}):windowTitle(i18n.t("Nivlet 设置"))
+        :windowStyle({"titled","closable","resizable"}):windowTitle("Nivlet for Mac")
         :transparent(false):allowTextEntry(true):html(html)
+        :windowCallback(function(event) if event=="closing" then hs.dockicon.hide() end end)
     showSettingsWindow(app.settings)
 end
 app.menu = hs.menubar.new(true,"NivletMain"):setTitle(""):setTooltip(i18n.t("Nivlet 设置"))

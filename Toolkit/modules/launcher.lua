@@ -38,6 +38,18 @@ local function clearBindings()
     for _,binding in ipairs(M.bindings) do binding:delete() end
     M.bindings={}
 end
+local feedback
+local function notify(message)
+    if feedback then hs.alert.closeSpecific(feedback,0) end
+    feedback=hs.alert.show(message,{textSize=18,radius=10,padding=14,fadeInDuration=0.1,fadeOutDuration=0.15},1.5)
+end
+local function shortcutLabel(shortcut)
+    local symbols={ctrl='⌃',alt='⌥',cmd='⌘',shift='⇧',left='←',right='→',up='↑',down='↓',['return']='↩'}
+    local parts={}
+    for _,mod in ipairs(shortcut.mods) do table.insert(parts,symbols[mod]) end
+    table.insert(parts,symbols[shortcut.key] or shortcut.key:upper())
+    return table.concat(parts)
+end
 local function install(config)
     if not config.enabled then return true end
     for _,rule in ipairs(config.rules) do
@@ -47,8 +59,11 @@ local function install(config)
             if preferences.systemAssigned(shortcut.mods,shortcut.key) or not hs.hotkey.assignable(shortcut.mods,shortcut.key) then clearBindings();return false,i18n.t('快捷键被系统占用或无法注册：')..shortcut.key end
             local bundleID=rule.bundleID
             local binding=hs.hotkey.bind(shortcut.mods,shortcut.key,function()
+                local running=#hs.application.applicationsForBundleID(bundleID)>0
+                local prefix=shortcutLabel(shortcut)..' · '
+                notify(prefix..i18n.t(running and '正在切换到：' or '正在启动：')..rule.name)
                 local ok,message=M.open(bundleID)
-                if not ok then hs.alert.show(message) end
+                if not ok then notify(prefix..message) end
             end)
             if not binding then clearBindings();return false,i18n.t('应用快捷键注册失败') end
             table.insert(M.bindings,binding)

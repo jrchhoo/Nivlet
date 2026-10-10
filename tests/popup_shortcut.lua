@@ -42,6 +42,7 @@ hs.json={encode=function(value)
     check(value);return '{}'
 end}
 hs.drawing={windowLevels={normal=0}}
+hs.dockicon={show=function() end,hide=function() end}
 desktopToolkit.settings={level=function(self,value) assert(value==0);return self end,hswindow=function() return {application=function() return {activate=function() end} end,focus=function() end} end,show=function(self) return self end,bringToFront=function(self) return self end,evaluateJavaScript=function() end}
 desktopToolkit.menu.items[1].fn(nil,{fn=function() end})
 assert(desktopToolkit.settingsFocus==nil and desktopToolkit.settingsSection==nil)

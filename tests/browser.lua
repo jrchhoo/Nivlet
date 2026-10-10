@@ -42,3 +42,9 @@ assert(b.status().active)
 hs.urlevent.getDefaultHandler=function(scheme) return scheme=='https' and 'com.apple.Safari' or 'dev.local.DesktopToolkit' end
 assert(not b.status().active)
 print('Source bundle matching is case-insensitive; both HTTP and HTTPS must be handled by Nivlet')
+
+local requested
+hs.urlevent.setDefaultHandler=function(scheme,bundle) requested={scheme,bundle} end
+b.requestDefault();assert(requested[1]=='https' and requested[2]=='dev.local.DesktopToolkit')
+assert(b.openDefaultSettings());assert(opened[1]=='x-apple.systempreferences:com.apple.Desktop-Settings.extension' and opened[2]=='com.apple.systempreferences')
+print('Explicit default browser request and system settings fallback passed')

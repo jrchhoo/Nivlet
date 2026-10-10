@@ -10,7 +10,7 @@ window.runCandidateRegression=function(data){
    check(document.getElementById(pageSaves[id]).getBoundingClientRect().width===0,'Old inline Save visible: '+id);
   }
   window.showSection('aboutSection');check(document.getElementById('saveSettings').hidden,'About has a redundant Save');
-  window.showSection('clipSection');document.getElementById('saveSettings').click();
+  window.showSection('clipSection');const clipEnabled=document.getElementById('clipEnabled');clipEnabled.checked=!clipEnabled.checked;updateSaveState();document.getElementById('saveSettings').click();
   check(captured.action==='saveClipboard'&&captured.popupShortcut&&captured.config,'Clipboard settings and hotkey are not saved together');
   const search=document.getElementById('clipSearch'),query=search.value;search.value='NIVLET-SEARCH-PROBE';search.dispatchEvent(new Event('input',{bubbles:true}));
   window.receive({...data,action:'refreshPermissionsSilent'});check(search.value==='NIVLET-SEARCH-PROBE','Permission refresh erased search');search.value=query;search.dispatchEvent(new Event('input',{bubbles:true}));

@@ -21,3 +21,9 @@ git -C "$upstream_dir" apply "$project_dir/patches/single-settings.patch"
 git -C "$upstream_dir" apply "$project_dir/patches/menu-image-visibility.patch"
 
 git -C "$upstream_dir" apply "$project_dir/patches/browser-sender.patch"
+
+git -C "$upstream_dir" apply "$project_dir/patches/browser-background.patch"
+
+git -C "$upstream_dir" apply "$project_dir/patches/dock-settings-lifecycle.patch"
+
+git -C "$upstream_dir" apply "$project_dir/patches/settings-title-icon.patch"

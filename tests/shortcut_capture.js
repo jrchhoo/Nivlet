@@ -8,8 +8,8 @@ let handler;
 vm.runInNewContext(script,{document:{addEventListener:(name,callback)=>{assert.equal(name,'keydown');handler=callback},getElementById:id=>flags[id]}});
 const key={id:'left-key',value:'',matches:()=>true,classList:{contains:()=>false},blur(){this.blurred=true}};
 function press(name,extra={}){const event={key:name,target:key,preventDefault(){this.prevented=true},...extra};handler(event);return event}
-assert(press('ArrowLeft').prevented);assert.equal(key.value,'left');
-press('ArrowUp',{ctrlKey:true,altKey:true});assert.equal(key.value,'up');assert(flags['left-ctrl'].checked&&flags['left-alt'].checked&&!flags['left-cmd'].checked);
+assert(press('ArrowLeft').prevented);assert.equal(key.value,'←');
+press('ArrowUp',{ctrlKey:true,altKey:true});assert.equal(key.value,'↑');assert(flags['left-ctrl'].checked&&flags['left-alt'].checked&&!flags['left-cmd'].checked);
 press('j');assert.equal(key.value,'J');assert(flags['left-ctrl'].checked,'Typing a plain key preserves selected modifiers');
 press('˚',{code:'KeyK',altKey:true});assert.equal(key.value,'K');assert(flags['left-alt'].checked&&!flags['left-ctrl'].checked);
 press('Backspace');assert.equal(key.value,'');
@@ -20,10 +20,10 @@ press('ArrowRight',{isComposing:true});assert.equal(key.value,'');
 key.matches=()=>false;assert(!press('ArrowLeft').prevented);key.matches=()=>true;
 const launcherFlags=['ctrl','alt','cmd','shift'].map(mod=>({dataset:{mod},checked:false}));
 key.classList.contains=()=>true;key.closest=()=>({querySelectorAll:()=>launcherFlags});
-press('ArrowRight',{metaKey:true,shiftKey:true});assert.equal(key.value,'right');assert(launcherFlags[2].checked&&launcherFlags[3].checked&&!launcherFlags[0].checked);
+press('ArrowRight',{metaKey:true,shiftKey:true});assert.equal(key.value,'→');assert(launcherFlags[2].checked&&launcherFlags[3].checked&&!launcherFlags[0].checked);
 console.log('Actual keyboard handler: arrow capture, modifiers, Option letter, clear, navigation and launcher rows passed');
 
-press('Enter',{ctrlKey:true});assert.equal(key.value,'return');
+press('Enter',{ctrlKey:true});assert.equal(key.value,'↩');
 press('+',{code:'Equal',ctrlKey:true,shiftKey:true});assert.equal(key.value,'=');
 press('–',{code:'Minus',altKey:true});assert.equal(key.value,'-');
 console.log('Actual keyboard handler captures Return, shifted equals and Option minus');

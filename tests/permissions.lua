@@ -24,3 +24,7 @@ assert(p.snapshot().accessibility=="granted")
 role=nil;message="The accessibility API is disabled";assert(p.snapshot().accessibility=="denied")
 message="Cannot complete";assert(p.snapshot().accessibility=="error")
 print("Cross-process AX probe detects stale trusted status after signing and distinguishes transient errors")
+
+hs.urlevent.openURLWithBundle=function(url,bundle) assert(url=="x-apple.systempreferences:com.apple.LoginItems-Settings.extension" and bundle=="com.apple.systempreferences");return true end
+assert(p.openLoginSettings());hs.urlevent.openURLWithBundle=function() return false end;assert(not p.openLoginSettings())
+print("Login Items opener preserves system launch success/failure")

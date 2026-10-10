@@ -27,6 +27,9 @@ fetch-runtime.sh 下载固定 Hammerspoon 1.1.1 commit 并应用 patch；已有 
 
 ```sh
 for test_file in tests/*.lua; do lua "$test_file" || exit 1; done
+# macOS + 完整 Xcode + 已准备 Runtime；隔离编译实际 Dock 策略源码，不操作用户 UI/配置
+python3 tests/dock_activation.py
+node tests/launcher_replace.js
 git diff --check
 ```
 
@@ -63,3 +66,7 @@ NIVLET_BUILD_CONFIGURATION=Release sh scripts/package-local.sh
 ```
 
 产物位于 `build/DerivedData/Build/Products/Release/Nivlet.app`，安装包名称带 `-release`，与 Debug 包区分。正式签名、公证及测试者验收见 [分发准备](DISTRIBUTION.md)，许可核查见 [第三方许可工程核查](THIRD-PARTY-AUDIT.md)。
+
+## 开发与发布顺序（2026-10-10）
+
+当前先完善现有功能与 UI、修复 Bug 并完成最终候选回归，再进行发布验收与发布；新增配置重载、WAN、截图、官网/更新服务和捐赠在发布之后开发。具体阶段 A/B/C、顺序和门槛以 ROADMAP.md 为准。发布依赖未满足时明确记录阻塞，不将预发布称为正式稳定版；新增功能不自动提前。此计划调整不代表授权上传、push 或替换已安装应用。

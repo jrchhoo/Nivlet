@@ -14,16 +14,16 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/jrchhoo/Nivlet/releases/tag/v1.0.0-rc.3">Download</a> ·
+  <a href="https://github.com/jrchhoo/Nivlet/releases/tag/v1.0.0-rc.5">Download</a> ·
   <a href="https://github.com/jrchhoo/Nivlet/issues">Report an issue</a> ·
   <a href="ROADMAP.md">Roadmap</a>
 </p>
 
 ## Current release
 
-Source checkpoint: `v1.0.0-rc.4` (Release Build 4 installed locally; full manual validation pending). Downloads below remain rc.3 / Build 3.
+Candidate: `v1.0.0-rc.5` / Build 13. Final Accessibility and Telegram-link revalidation is in progress; publication follows acceptance.
 
-**v1.0.0-rc.3 · App 1.0.0 / Build 3 · Pre-release**
+**v1.0.0-rc.5 · App 1.0.0 / Build 13 · Pre-release**
 
 DMG, ZIP and SHA-256 files are available for Apple Silicon (arm64). The bundle declares macOS 13.0 as its minimum; other macOS versions, Intel, multiple displays and installation on other Macs have not been fully validated.
 
@@ -46,7 +46,7 @@ Nivlet is the brand; Nivlet for Mac is the display name. The installed app remai
 
 ## Install and get started
 
-1. Download **either the DMG or the ZIP** from [Releases](https://github.com/jrchhoo/Nivlet/releases/tag/v1.0.0-rc.3).
+1. Download **either the DMG or the ZIP** from [Releases](https://github.com/jrchhoo/Nivlet/releases/tag/v1.0.0-rc.5).
 2. Move `Nivlet.app` to Applications and open it. Run only one copy.
 3. Click the menu bar **N icon → Settings…**, or open the app again to access settings. `Command+,` also opens settings while Nivlet is active.
 4. Enable the features you need, configure their rules and click **Save Settings in the bottom-right corner**. General switches also require saving. Switching tabs preserves drafts and shows an unsaved-changes hint.

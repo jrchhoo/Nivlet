@@ -14,16 +14,16 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/jrchhoo/Nivlet/releases/tag/v1.0.0-rc.3">下载安装</a> ·
+  <a href="https://github.com/jrchhoo/Nivlet/releases/tag/v1.0.0-rc.5">下载安装</a> ·
   <a href="https://github.com/jrchhoo/Nivlet/issues">问题反馈</a> ·
   <a href="ROADMAP.md">开发计划</a>
 </p>
 
 ## 当前版本
 
-源码开发节点：`v1.0.0-rc.4`（本机 Release Build 4 已安装，整体测试待完成）；下方下载仍为 rc.3 / Build 3。
+当前候选：`v1.0.0-rc.5` / Build 13。最终安装版权限与 TG 接链复验进行中；通过后发布。
 
-**v1.0.0-rc.3 · 应用 1.0.0 / Build 3 · 预发布测试版**
+**v1.0.0-rc.5 · 应用 1.0.0 / Build 13 · 预发布测试版**
 
 目前提供 Apple Silicon（arm64）的 DMG、ZIP 和 SHA-256 校验文件。包声明最低 macOS 13.0；其他 macOS、Intel、多显示器及跨机器安装尚未全面验收。
 
@@ -46,7 +46,7 @@ Nivlet 是品牌名，Nivlet for Mac 是展示名称；安装的应用仍为 `Ni
 
 ## 安装与开始使用
 
-1. 从 [Releases](https://github.com/jrchhoo/Nivlet/releases/tag/v1.0.0-rc.3) 下载 **DMG 或 ZIP，任选一个**。
+1. 从 [Releases](https://github.com/jrchhoo/Nivlet/releases/tag/v1.0.0-rc.5) 下载 **DMG 或 ZIP，任选一个**。
 2. 将 `Nivlet.app` 放入“应用程序”文件夹并打开，只运行一份应用。
 3. 点击菜单栏 **N 图标 → 设置…**，也可以再次打开 App 进入设置；`Command+,` 在 Nivlet 中也可打开设置。
 4. 按需启用功能、填写规则，然后点击窗口**右下角“保存设置”**。通用开关也需要保存；切换标签会保留草稿并提示未保存修改。

@@ -70,6 +70,12 @@ function M.save(value)
     for _,rule in ipairs(config.appRules) do if not hs.application.pathForBundleID(rule.browser) then return false,i18n.t("来源应用规则中的浏览器未安装") end end
     M.config=config;hs.settings.set(settingsKey,config);return true,i18n.t("浏览器规则已保存")
 end
+function M.requestDefault()
+    hs.urlevent.setDefaultHandler("https", "dev.local.DesktopToolkit")
+end
+function M.openDefaultSettings()
+    return hs.urlevent.openURLWithBundle("x-apple.systempreferences:com.apple.Desktop-Settings.extension", "com.apple.systempreferences")
+end
 function M.status()
     local http=hs.urlevent.getDefaultHandler("http")
     local https=hs.urlevent.getDefaultHandler("https")
