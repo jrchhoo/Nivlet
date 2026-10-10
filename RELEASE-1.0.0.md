@@ -4,7 +4,7 @@
 
 内置 GitHub 链接统一为 `wivnelo/Nivlet`。关于页官网入口已接入 https://wivnelo.github.io/Nivlet/ ，链接集中展示，更新独立成区。Sparkle 2.10.0 使用 Nivlet 独立 HTTPS appcast 与 Ed25519 更新包签名；私钥仅存本机钥匙串，不进入仓库。默认手动检查，确认后下载、校验、覆盖与重启；草稿未保存时阻止启动更新检查。
 
-Build 16 → 18 的真实更新已使 /Applications/Nivlet.app 运行 Build 18；再次检查显示已是最新。通用、窗口、输入法、应用启动、浏览器配置与更新前一致；剪贴板历史有新增，系统 MAC 显示开关有变化，归因待用户确认。当前辅助功能实测已开启。签名验证、篡改拒绝、ZIP CRC、SHA-256、Release 构建、全部 Lua 回归和许可检查通过；重新从 GitHub 下载的三份附件与本地产物一致。正式版附件收敛为 Build 18；旧 tag 不重写。仍为 ad-hoc，未 Developer ID 签名或公证，Intel/跨机器验收仍开放。
+Build 16 → 18 的真实更新已使 /Applications/Nivlet.app 运行 Build 18；再次检查显示已是最新。通用、窗口、输入法、应用启动、浏览器配置与更新前一致；用户确认安装/重启及系统 MAC 显示开关变更均为本人操作；剪贴板历史正常新增，未发现更新导致配置丢失。当前辅助功能实测已开启。签名验证、篡改拒绝、ZIP CRC、SHA-256、Release 构建、全部 Lua 回归和许可检查通过；重新从 GitHub 下载的三份附件与本地产物一致。正式版附件收敛为 Build 18；旧 tag 不重写。仍为 ad-hoc，未 Developer ID 签名或公证，Intel/跨机器验收仍开放。
 
 以下构建号及状态按历史记录保留。
 
