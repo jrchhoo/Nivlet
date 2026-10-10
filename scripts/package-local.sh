@@ -19,7 +19,7 @@ trap 'rm -rf "$stage"' EXIT HUP INT TERM
 ditto "$app_path" "$stage/Nivlet.app"
 ln -s /Applications "$stage/Applications"
 cat > "$stage/安装说明-Read-Me.txt" <<'TXT'
-Nivlet for Mac 1.0.0 — 本机验收候选包 / Local validation build
+Nivlet for Mac 1.0.0 — GitHub 发行版 / GitHub release
 
 将 Nivlet.app 拖入 Applications 后打开。无需另装 Hammerspoon。
 在通用设置配置外观和语言；窗口、剪贴板、输入法、浏览器及应用快捷启动按需开启。
@@ -30,7 +30,7 @@ Nivlet for Mac 1.0.0 — 本机验收候选包 / Local validation build
 Drag Nivlet.app into Applications. No separate Hammerspoon installation is needed.
 Enable modules in Settings. Window management and Option-paste require Accessibility permission.
 Settings and history are stored locally. Updating the App does not require deleting its data.
-This local build has no Developer ID signature or notarization and has not passed cross-machine validation.
+This build has no Developer ID signature or notarization and has not passed cross-machine validation.
 TXT
 ditto -c -k --sequesterRsrc --keepParent "$app_path" "$output/$base.zip"
 hdiutil create -quiet -volname "Nivlet $version" -srcfolder "$stage" -ov -format UDZO "$output/$base.dmg"

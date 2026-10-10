@@ -1,5 +1,12 @@
 # Nivlet 开发计划
 
+## GitHub 1.0.0 发行基准（2026-10-10）
+
+用户决定暂不考虑 App Store，采用无需付费账号的 GitHub 正式发行路线。v1.0.0 使用应用 1.0.0 / Build 14，功能与已验收 Build 13 一致，包内补齐 81 份许可文件；rc.5 保留历史。本机 /Applications/Nivlet.app 继续保留 Build 13，不替换、不重签名，不修改个人配置。
+
+GitHub 正式发行状态与 Apple 信任链独立：Build 14 仍为 ad-hoc，未 Developer ID 签名、未公证，首次下载/Gatekeeper、Intel、其他机器与多屏仍未全面验证。完整许可法律审查不能由自动收集替代。Build 14 完整 Release 构建、全部 Lua 回归、许可原文回归、原生 Dock 与按键测试通过；104 个 Mach-O 均含双架构，严格签名、ZIP CRC、DMG 和 SHA-256 通过。未启动或安装 Build 14。正式发布说明见 [RELEASE-v1.0.0.md](RELEASE-v1.0.0.md)。以下旧状态为历史记录。
+
+
 当前阶段：Nivlet 1.0.0 现有功能完善与验收。执行顺序固定为：**完善优化现有功能 → 验收并发布 → 添加新功能**。已实现不等同于最终安装版完整验收；本机验证不等同于正式发布。
 
 ## 当前状态

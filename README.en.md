@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/jrchhoo/Nivlet/releases/tag/v1.0.0-rc.5">Download</a> ·
+  <a href="https://github.com/jrchhoo/Nivlet/releases/tag/v1.0.0">Download</a> ·
   <a href="https://github.com/jrchhoo/Nivlet/issues">Report an issue</a> ·
   <a href="ROADMAP.md">Roadmap</a>
 </p>
@@ -23,15 +23,15 @@
 
 [Current baseline and next steps (Chinese)](BASELINE.md)
 
-Candidate: `v1.0.0-rc.5` / Build 13. Accessibility access was verified, and the user confirmed Telegram links open in Chrome without revealing Nivlet settings.
+Release: `v1.0.0` / Build 14. Features match accepted Build 13, where Accessibility and Telegram-to-Chrome routing without settings flashes were verified. Build 14 has not replaced the local installation.
 
 The user also tested configuration and daily use under another macOS account with no major issues reported. Fresh installation, Gatekeeper and other-Mac compatibility remain unverified.
 
-**v1.0.0-rc.5 · App 1.0.0 / Build 13 · Pre-release**
+**v1.0.0 · App 1.0.0 / Build 14 · GitHub release**
 
 DMG, ZIP and SHA-256 files are available for Apple Silicon (arm64). The bundle declares macOS 13.0 as its minimum; other macOS versions, Intel, multiple displays and installation on other Macs have not been fully validated.
 
-> The package uses an ad-hoc development signature. It has no Developer ID signature or Apple notarization, so macOS may block it after download. Consider this limitation before trying it. This is not a stable release yet.
+> The package uses an ad-hoc development signature. It has no Developer ID signature or Apple notarization, so macOS may block it after download. Consider this limitation before trying it. A GitHub release does not imply Apple notarization.
 
 Nivlet is the brand; Nivlet for Mac is the display name. The installed app remains `Nivlet.app`. No separate Hammerspoon installation or code editing is required.
 
@@ -50,7 +50,7 @@ Nivlet is the brand; Nivlet for Mac is the display name. The installed app remai
 
 ## Install and get started
 
-1. Download **either the DMG or the ZIP** from [Releases](https://github.com/jrchhoo/Nivlet/releases/tag/v1.0.0-rc.5).
+1. Download **either the DMG or the ZIP** from [Releases](https://github.com/jrchhoo/Nivlet/releases/tag/v1.0.0).
 2. Move `Nivlet.app` to Applications and open it. Run only one copy.
 3. Click the menu bar **N icon → Settings…**, or open the app again to access settings. `Command+,` also opens settings while Nivlet is active.
 4. Enable the features you need, configure their rules and click **Save Settings in the bottom-right corner**. General switches also require saving. Switching tabs preserves drafts and shows an unsaved-changes hint.
