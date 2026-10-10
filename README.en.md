@@ -21,7 +21,11 @@
 
 ## Current release
 
+[Current baseline and next steps (Chinese)](BASELINE.md)
+
 Candidate: `v1.0.0-rc.5` / Build 13. Accessibility access was verified, and the user confirmed Telegram links open in Chrome without revealing Nivlet settings.
+
+The user also tested configuration and daily use under another macOS account with no major issues reported. Fresh installation, Gatekeeper and other-Mac compatibility remain unverified.
 
 **v1.0.0-rc.5 · App 1.0.0 / Build 13 · Pre-release**
 
@@ -86,7 +90,7 @@ Launcher rules open an app or bring it forward. Adding the same app again highli
 
 1. In Settings → Browser, choose a fallback browser and add domain or source-app rules.
 2. Enable and save. Use the match check and open-by-rule actions to test; a simulated source can check app rules.
-3. To route links from other apps, manually set **Nivlet as the macOS default web browser**. Switch back to your previous browser to stop routing.
+3. Click “Set as Default Browser…” and complete the macOS confirmation, then check again. If no prompt appears, use “Open Default Browser Settings…” and select Nivlet. Switch back to your previous browser to stop routing.
 
 Priority is **domain → source app → fallback**. Domain rules match from top to bottom, support subdomains and can be reordered with ↑ / ↓. Installed Safari, Chrome, Firefox, Edge and Brave are supported. Only HTTP/HTTPS links are handled. Some apps do not expose an identifiable source; domain rules or the fallback apply in that case.
 
@@ -101,7 +105,7 @@ In Input Sources, add an app and choose one of the system's enabled input source
 - Language: follow system, Simplified Chinese or English. Appearance: follow system, light or dark. Both follow the system by default.
 - Hide or show the main N icon independently of clipboard and system information. The intended order is network speed → clipboard → N; positions also depend on macOS's saved state.
 - Drag tabs to reorder them. General stays first and About stays last. Tab order saves automatically; other editable settings use the bottom-right save button.
-- Launch at login takes effect after saving. Optional Command+L sleep is off by default; enabling it overrides the same shortcut in apps such as browsers.
+- Launch at login takes effect after saving. Optional Command + L sleep is off by default; enabling it overrides the same shortcut in apps such as browsers.
 - Export JSON or a default example from General → Configuration Backup & Migration. Review the replacement scope before importing. Omitted modules stay unchanged; failures restore the previous configuration. History, caches, permissions, login items and the system default browser are excluded. See the [configuration guide](CONFIGURATION.md) (Chinese).
 
 ## Privacy

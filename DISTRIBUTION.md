@@ -1,5 +1,15 @@
 # Nivlet for Mac 分发准备与验收
 
+
+## 新用户补充验收（2026-10-10）
+
+用户已建立另一 macOS 用户；系统检测已下载 App 与共享的 /Applications/Nivlet.app 一致，因此未覆盖安装。在无原用户配置的环境下，用户重新配置各模块并反馈均已测试，暂无明显重大问题。此证据确认同机新用户配置与日常使用，不等同于首次安装/Gatekeeper、其他硬件或 macOS 的验收。
+
+用户补充登录自启动目前暂无明显问题，要求暂不继续排查；从当前阻塞项移至观察，复发再收集证据。没有单独的注销登录测试记录，不将其写成已独立验证全部登录场景。当前 rc.5 / Build 13 作为冻结预发布基准继续使用，GitHub 已发布，无需重打包或重复发布相同二进制。
+
+> 当前基准为已发布的 v1.0.0-rc.5 / Build 13；最新状态与下一步见 [BASELINE.md](BASELINE.md)。以下阶段记录保留当时状态。
+
+
 本清单区分免费可完成的工程准备和需要 Apple Developer Program 的正式分发步骤。GitHub 测试包不等于已通过 Apple 公证的稳定版。
 
 ## 无付费账号的本地构建
@@ -7,7 +17,7 @@
 已按 DEVELOPMENT.md 准备固定 Runtime 和 Xcode 后运行：
 
 ```sh
-NIVLET_BUILD_NUMBER=4 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer sh scripts/build-release.sh
+NIVLET_BUILD_NUMBER=14 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer sh scripts/build-release.sh
 NIVLET_BUILD_CONFIGURATION=Release sh scripts/package-local.sh
 ```
 
