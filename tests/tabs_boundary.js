@@ -1,6 +1,8 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
 const html=fs.readFileSync('Toolkit/settings.html','utf8');
-const source=html.slice(html.indexOf('const currentTabOrder='),html.indexOf("document.getElementById('saveGeneral').onclick"));
+const start=html.indexOf('const currentTabOrder='),end=html.indexOf("for(const action of ['setDefaultBrowser'",start);
+assert(start>=0&&end>start,'Tab handler source boundaries missing');
+const source=html.slice(start,end);
 const ids=['generalSection','windowSection','inputSection','clipSection','systemSection','browserSection','launcherSection','aboutSection'];
 let handlers={},saved;
 const nav={children:[],querySelectorAll(){return this.children},append(tab){this.insertBefore(tab,null)},insertBefore(tab,before){this.children=this.children.filter(x=>x!==tab);const index=before?this.children.indexOf(before):this.children.length;this.children.splice(index,0,tab)}};

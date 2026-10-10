@@ -10,7 +10,11 @@ root = Path(__file__).resolve().parent.parent
 ns = {'s': 'http://www.andymatuschak.org/xml-namespaces/sparkle'}
 item = ET.parse(root / 'docs/appcast.xml').find('./channel/item')
 entry = item.find('enclosure')
-assert entry.attrib['url'].startswith('https://github.com/wivnelo/Nivlet/releases/download/v1.0.0/')
+version = item.find('s:shortVersionString', ns).text
+assert entry.attrib['url'].startswith(f'https://github.com/wivnelo/Nivlet/releases/download/v{version}/')
+assert item.find('s:hardwareRequirements', ns).text == 'arm64'
+previous = ET.parse(root / 'docs/appcast.xml').findall('./channel/item')[1:]
+assert any(old.find('s:version', ns).text == '18' and old.find('s:hardwareRequirements', ns) is None for old in previous)
 archive = root / 'build/packages' / entry.attrib['url'].rsplit('/', 1)[1]
 assert archive.stat().st_size == int(entry.attrib['length'])
 with zipfile.ZipFile(archive) as package:

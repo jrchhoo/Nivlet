@@ -6,15 +6,20 @@
 
 | 项目 | 当前状态 |
 | --- | --- |
-| 软件 | Nivlet for Mac，应用 1.0.0 / Build 18 |
-| 本机安装 | `/Applications/Nivlet.app`，已核实 Build 18 |
-| 正式发布 | [v1.0.0](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.0)，非预发布；DMG、ZIP、SHA-256 均为 Build 18 |
+| 软件 | Nivlet for Mac，本机应用 1.0.0 / Build 19（未发布） |
+| 最新本地包 | 1.0.1 / Build 20，arm64 Release，已回归打包并发布、未安装；见 [Build 20 验收](documentation/VALIDATION-BUILD20.md) |
+| 本机安装 | `/Applications/Nivlet.app`，已替换并核实 Build 19，arm64-only |
+| 正式发布 | [v1.0.1](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.1)，非预发布；DMG、ZIP、SHA-256 均为 Build 20 |
 | 仓库 | [wivnelo/Nivlet](https://github.com/wivnelo/Nivlet) |
 | 官网 | [Nivlet for Mac](https://wivnelo.github.io/Nivlet/) |
 | 更新通道 | `https://wivnelo.github.io/Nivlet/appcast.xml`，Sparkle 2.10.0、Ed25519 包签名 |
 | 分发方式 | GitHub 直接分发；暂不考虑 App Store |
 
 当前处于“首版已正式发布，继续完善现有功能与分发验收”的节点。GitHub 正式发布不代表完成 Apple Developer ID 签名或公证。
+
+## 当前发行架构
+
+Build 19 起仅支持 Apple Silicon Mac（arm64），不支持 Intel Mac（x86_64/x86）。本地优化包已安装并完成现有功能分层验收，详见 [Build 19 验收](documentation/VALIDATION-BUILD19.md)。公开正式附件为 1.0.1 / Build 20，更新通道加入 arm64 限制并保留旧 Build 18；双架构信息仅适用于旧包。
 
 ## 已完成
 
@@ -35,13 +40,13 @@
 - 更新前后通用、窗口、输入法、应用启动、浏览器配置保持一致；剪贴板历史正常新增，未发现配置丢失；辅助功能已检测开启。
 - Release 构建、全部 Lua 回归、许可收集回归、更新签名和篡改拒绝、严格 ad-hoc 签名、ZIP CRC、DMG、SHA-256 检查通过。GitHub 三份附件与本地产物一致。
 - 早期版本已有窗口、应用启动、剪贴板、浏览器及同机新用户验收；用户也反馈正式版重新下载安装可用。这些不等于在 Build 18 上重新执行所有历史场景。
-- 包含 arm64/x86_64；Intel 实机、其他 Mac/其他 macOS、多显示器及完整 Gatekeeper 流程仍未全面覆盖。同机新用户测试不能替代跨机器测试。
+- 正式发布的 Build 18 包含 arm64/x86_64；本机 Build 19 仅 arm64，不支持 Intel。其他 Apple Silicon Mac/macOS、多显示器及完整 Gatekeeper 流程仍未全面覆盖。同机新用户测试不能替代跨机器测试。
 - 当前使用 ad-hoc 签名，未 Developer ID 签名和 Apple 公证；开发签名替换可能使辅助功能授权失效。
 - 更新包签名不等于 Apple 公证；第三方许可自动收集不等于完整法律审查。
 
 ## 下一步
 
-按 [ROADMAP.md](ROADMAP.md) 执行：**完善现有功能 → 验收并发布 → 新功能**。先统一浏览器状态提示，再补更新异常场景与后续发行流程；登录自启动按用户要求保持观察，复发再排查。
+按 [ROADMAP.md](ROADMAP.md) 执行：**完善现有功能 → 验收并发布 → 新功能**。设置界面和浏览器状态优化已完成并打包为 1.0.1 / Build 20；下一步补新包安装验收、更新异常场景与后续发行流程；登录自启动按用户要求保持观察，复发再排查。
 
 下一轮开始先检查 Git 状态、实际安装版本与加载路径。不得自动覆盖或重签名已安装应用，不修改个人 Hammerspoon，不清理个人配置或剪贴板历史。安装、系统设置和发布操作遵循当轮授权。
 
@@ -51,6 +56,6 @@
 
 - 产品介绍：[中文](README.zh-CN.md) / [English](README.md)
 - 操作：[使用指南](documentation/USAGE.md)、[安装指南](documentation/INSTALLATION.md)、[配置说明](documentation/CONFIGURATION.md)
-- 计划与当前版本：[开发计划](ROADMAP.md)、[正式发布说明](documentation/RELEASE-v1.0.0.md)
+- 计划与当前版本：[开发计划](ROADMAP.md)、[正式发布说明](documentation/RELEASE-v1.0.1.md)
 - 工程：[开发构建](documentation/DEVELOPMENT.md)、[分发流程](documentation/DISTRIBUTION.md)、[验证记录](documentation/VALIDATION.md)、[许可核查](documentation/THIRD-PARTY-AUDIT.md)
 - 历史：[10 月 9 日](documentation/archive/STAGE-2026-10-09.md)、[10 月 10 日](documentation/archive/STAGE-2026-10-10.md)、[候选版验收](documentation/archive/RELEASE-1.0.0.md)

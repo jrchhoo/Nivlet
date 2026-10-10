@@ -29,13 +29,21 @@ ET.SubElement(item, 'title').text = f'Nivlet {version} · Build {build}'
 ET.SubElement(item, f'{{{ns}}}version').text = build
 ET.SubElement(item, f'{{{ns}}}shortVersionString').text = version
 ET.SubElement(item, f'{{{ns}}}minimumSystemVersion').text = '13.0'
-ET.SubElement(item, 'description').text = '官网入口与签名自动更新。Website and signed in-app updates.'
+ET.SubElement(item, f'{{{ns}}}hardwareRequirements').text = 'arm64'
+ET.SubElement(item, 'link').text = f'https://github.com/wivnelo/Nivlet/releases/tag/v{version}'
+ET.SubElement(item, 'description').text = 'Smaller Apple Silicon package and clearer settings. 更小的 Apple Silicon 安装包与更清晰的设置界面。'
 ET.SubElement(item, 'enclosure', {
     'url': f'https://github.com/wivnelo/Nivlet/releases/download/v{version}/{archive.name}',
     'length': str(archive.stat().st_size),
     'type': 'application/octet-stream',
     f'{{{ns}}}edSignature': signature,
 })
+# Keep older compatible releases available to Intel Macs.
+feed = root / 'docs/appcast.xml'
+if feed.exists():
+    for previous in ET.parse(feed).findall('./channel/item'):
+        if int(previous.find(f'{{{ns}}}version').text) < int(build):
+            channel.append(previous)
 ET.indent(rss)
 ET.ElementTree(rss).write(root / 'docs/appcast.xml', encoding='utf-8', xml_declaration=True)
 print(f'Signed update feed generated: {version} Build {build}')

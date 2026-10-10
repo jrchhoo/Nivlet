@@ -1,10 +1,16 @@
 # 安装、升级与卸载
 
-适用版本：v1.0.0 / 1.0.0 Build 18，GitHub 正式发行版，仍未通过 Apple 公证。
+适用版本：v1.0.1 / 1.0.1 Build 20，GitHub 正式发行版，仍未通过 Apple 公证。
+
+## 系统要求
+
+- macOS 13.0 或更高版本。
+- **Build 19 起仅支持 Apple Silicon Mac（arm64），不支持 Intel Mac（x86_64/x86）。** 可在“关于本机”查看芯片类型。
+- 当前正式版为 v1.0.1 / Build 20，仅含 arm64。Intel 用户可保留旧版 v1.0.0 / Build 18；旧包包含 Intel 切片不代表 Intel 实机验收通过。
 
 ## 首次安装
 
-1. 从 [GitHub Release](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.0) 下载 DMG 或 ZIP，任选一种；不要运行多个副本。
+1. 从 [GitHub Release](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.1) 下载 DMG 或 ZIP，任选一种；不要运行多个副本。
 2. DMG 打开后将 Nivlet.app 拖入 Applications；ZIP 解压后将 App 放入 Applications。
 3. 从 Applications 打开，使用菜单栏 N 图标进入设置。无需另外安装 Hammerspoon。
 4. 先按需要配置并保存；窗口管理和 Option 直接粘贴需要辅助功能权限，其他模块不因此要求授权。
@@ -19,7 +25,7 @@
 把 ZIP、DMG 及同版本的 .sha256 文件放在同一文件夹，在该文件夹运行：
 
 ```sh
-shasum -a 256 -c Nivlet-1.0.0-build18-x86_64-arm64-local-release.sha256
+shasum -a 256 -c Nivlet-1.0.1-build20-arm64-local-release.sha256
 ```
 
 两个安装包都在时应各显示 OK；缺少其中一个会报该文件不存在，不代表另一个损坏。校验文件检测传输一致性，不替代 Apple 签名公证。
@@ -45,9 +51,9 @@ shasum -a 256 -c Nivlet-1.0.0-build18-x86_64-arm64-local-release.sha256
 
 ## 已知限制与反馈
 
-- 尚无 Developer ID 签名和 Apple 公证；下载首次安装、Gatekeeper、Intel、其他 macOS、多屏与跨机器测试未完整覆盖。
+- 尚无 Developer ID 签名和 Apple 公证；下载首次安装、Gatekeeper、其他 Apple Silicon Mac/macOS、多屏与跨机器测试未完整覆盖。Build 19 起不支持 Intel。
 - 同机新用户配置使用已由用户反馈暂无明显重大问题；登录启动按反馈转观察，暂不继续排查。
-- 关于页更新通道、官网与捐赠尚未接入；新版本暂通过 GitHub Releases 手动获取。
+- 关于页已接入官网和手动更新通道；捐赠尚未接入。当前公开下载为 1.0.1 / Build 20，更新通道仅向 arm64 提供此版本。
 - 报告问题请提供应用版本/Build、macOS、芯片、操作步骤与提示；不要上传敏感剪贴板内容、完整私人配置或凭据。
 
 现有模块使用方式见 [README](../README.md)，当前验证状态见 [BASELINE](../BASELINE.md)，工程验收见 [DISTRIBUTION](DISTRIBUTION.md)。

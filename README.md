@@ -45,7 +45,7 @@ Nivlet is a free, open-source macOS menu bar utility that brings everyday deskto
 
 Features are opt-in, and shortcuts are yours to configure. Window management and Option-click paste require **Accessibility permission**. Browser routing requires choosing **Nivlet as your default browser**.
 
-> **Installation note:** This release has no Developer ID signature or Apple notarization; macOS may block first launch. See the [installation, upgrade and removal guide](documentation/INSTALLATION.md) (Chinese). Declared minimum: macOS 13.0. The package includes Apple Silicon and Intel architectures; Intel, other macOS versions and multiple displays have not been fully validated.
+> **Installation note:** This release has no Developer ID signature or Apple notarization; macOS may block first launch. See the [installation, upgrade and removal guide](documentation/INSTALLATION.md) (Chinese). Declared minimum: macOS 13.0. **Build 19 and later require an Apple Silicon Mac (arm64). Intel Macs (x86_64/x86) are not supported.** The latest release is v1.0.1 / Build 20, arm64 only. The older v1.0.0 / Build 18 remains available for Intel Macs. Other Macs/macOS versions and multiple displays have not been fully validated.
 
 ## Local processing, optional recording
 

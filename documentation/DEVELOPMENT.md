@@ -2,7 +2,7 @@
 
 ## 当前工程基准（2026-10-10）
 
-正式版为 1.0.0 / Build 18，已安装并发布；当前状态以 [BASELINE.md](../BASELINE.md) 为准。旧构建阶段记录已移入归档。
+公开正式版为 1.0.0 / Build 18；本机已安装 Build 19（arm64-only，未发布），当前状态以 [BASELINE.md](../BASELINE.md) 为准。旧构建阶段记录已移入归档。
 
 - Runtime 固定来源；构建通过 `scripts/prepare-updater.sh` 准备固定 Sparkle 2.10.0，许可收集包含其原文。
 - Release 构建使用完整 Xcode：`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=19 sh scripts/build-release.sh`。19 仅为下一构建示例，实际发布前核对并递增；构建不自动安装。
@@ -14,6 +14,14 @@
 
 
 ## 常用检查
+
+### Build 19 的包体积优化（本机已安装，尚未发布）
+
+- 后续本地构建仅支持 Apple Silicon（arm64）；Build 18 正式发布包仍为双架构，不覆盖旧包或更新通道。
+- Xcode 与 `system-probe` 编译为 arm64；打包前遍历所有 Mach-O，去除 Sparkle 等嵌套组件的 Intel 切片，缺少 arm64 时停止构建。
+- 关于页 PNG 生成 160 × 160 资源，对应 80 × 80 Retina 显示；原始品牌图、Dock 与菜单栏图标保持原样。
+- Release 主程序使用 `strip -S -x`，保留外部符号；裁剪前要求旁边存在匹配 UUID 的 dSYM，裁剪后核对外部符号和 UUID。dSYM 留在构建目录，不进入安装包。动态扩展不额外 strip。
+- 可用 `NIVLET_DERIVED_DATA_PATH` 指定独立的绝对构建目录；构建与打包必须传入相同值。例如 `NIVLET_DERIVED_DATA_PATH="$PWD/build/DerivedData-arm64"`，避免覆盖旧双架构构建产物。
 
 从仓库根目录执行：
 

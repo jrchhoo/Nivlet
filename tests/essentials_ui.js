@@ -26,7 +26,9 @@ window.runEssentialsRegression=function(data){
   document.querySelector('.open-accessibility').click();check(captured.action==='openAccessibility','Settings link missing');
   const shortcut=document.getElementById('left-key'),priorKey=shortcut.value;shortcut.value='q';shortcut.dispatchEvent(new Event('input',{bubbles:true}));check(shortcut.value==='Q','Pasted shortcut letter not uppercase');shortcut.value=priorKey;
   window.showSection('aboutSection');check(!document.getElementById('aboutSection').hidden,'About not reachable');
-  document.querySelector('#aboutSection a').click();check(captured.action==='openProjectLink'&&captured.link==='project','External link bypasses opener');
+  const firstLink=document.querySelector('#aboutSection a');check(firstLink.getAttribute('href')==='https://wivnelo.github.io/Nivlet/','Website is not the first About link');
+  firstLink.click();check(captured.action==='openProjectLink'&&captured.link==='website','Website link bypasses opener');
+  document.querySelector('#aboutSection a[href="https://github.com/wivnelo/Nivlet"]').click();check(captured.action==='openProjectLink'&&captured.link==='project','External link bypasses opener');
   check(document.querySelectorAll('#tab-aboutSection').length===1,'About tab missing or duplicated');
   window.receive({...data,language:'en',action:'refreshPermissions',permissions:{accessibility:'error'},about:{version:'1.2.3',build:'4',license:'<script>unsafe</script>',notices:'Fixture'}});
   check(document.getElementById('tab-aboutSection').textContent==='About','About English missing');

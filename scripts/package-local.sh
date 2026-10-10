@@ -4,7 +4,8 @@ set -eu
 project_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 configuration=${NIVLET_BUILD_CONFIGURATION:-Debug}
 case "$configuration" in Debug|Release) ;; *) echo "Unsupported build configuration: $configuration" >&2; exit 1 ;; esac
-app_path="$project_dir/build/DerivedData/Build/Products/$configuration/Nivlet.app"
+derived_data=${NIVLET_DERIVED_DATA_PATH:-"$project_dir/build/DerivedData"}
+app_path="$derived_data/Build/Products/$configuration/Nivlet.app"
 version=$(cat "$project_dir/VERSION")
 build=$(/usr/libexec/PlistBuddy -c Print:CFBundleVersion "$app_path/Contents/Info.plist")
 test "$(/usr/libexec/PlistBuddy -c Print:CFBundleShortVersionString "$app_path/Contents/Info.plist")" = "$version"
@@ -18,15 +19,16 @@ stage=$(mktemp -d "$project_dir/build/package-stage.XXXXXX")
 trap 'rm -rf "$stage"' EXIT HUP INT TERM
 ditto "$app_path" "$stage/Nivlet.app"
 ln -s /Applications "$stage/Applications"
-cat > "$stage/安装说明-Read-Me.txt" <<'TXT'
-Nivlet for Mac 1.0.0 — GitHub 发行版 / GitHub release
-
+printf 'Nivlet for Mac %s — 本地验证包 / Local validation build\n\n' "$version" > "$stage/安装说明-Read-Me.txt"
+cat >> "$stage/安装说明-Read-Me.txt" <<'TXT'
+仅支持 Apple Silicon Mac（arm64），不支持 Intel Mac（x86_64/x86）。
 将 Nivlet.app 拖入 Applications 后打开。无需另装 Hammerspoon。
 在通用设置配置外观和语言；窗口、剪贴板、输入法、浏览器及应用快捷启动按需开启。
 窗口管理和 Option 直接粘贴需要在系统设置中允许辅助功能。
 配置与历史保存在本机；升级时只替换 App，不删除数据目录。
 此包使用开发签名，尚未经过 Developer ID 签名、公证与其他机器验收。
 
+Apple Silicon Mac (arm64) only. Intel Mac (x86_64/x86) is not supported.
 Drag Nivlet.app into Applications. No separate Hammerspoon installation is needed.
 Enable modules in Settings. Window management and Option-paste require Accessibility permission.
 Settings and history are stored locally. Updating the App does not require deleting its data.

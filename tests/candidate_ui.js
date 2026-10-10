@@ -18,6 +18,13 @@ window.runCandidateRegression=function(data){
   window.showSection('browserSection');check(sleep.checked===!before,'Tab switch lost draft');
   window.receive({...data,action:'refreshPermissionsSilent',browserStatus:{active:false}});check(document.getElementById('browserRoutingStatus').textContent.includes('Nivlet'),'Missing browser setup warning');
   window.receive({...data,action:'refreshPermissionsSilent',browserStatus:{active:true}});check(document.getElementById('browserRoutingStatus').textContent===t('已接管系统网页链接'),'Active handler status incorrect');
+  check(document.getElementById('browserRoutingStatus').dataset.state==='granted','Active browser status not successful');
+  check(document.getElementById('openDefaultBrowserSettings').hidden&&document.querySelector('.routing-actions').hidden,'Active browser still shows setup actions');
+  window.receive({...data,action:'refreshPermissionsSilent',permissions:{accessibility:'denied'},browserStatus:{active:true}});
+  check(document.getElementById('browserRoutingStatus').textContent===t('已接管系统网页链接'),'Accessibility refresh overwrote browser status');
+  window.receive({...data,action:'refreshPermissionsSilent',browserStatus:{active:false}});
+  check(document.getElementById('browserRoutingStatus').dataset.state!=='granted','Inactive browser retained successful status');
+  check(!document.getElementById('openDefaultBrowserSettings').hidden&&!document.querySelector('.routing-actions').hidden&&!document.getElementById('setDefaultBrowser').hidden,'Setup actions did not return after losing default browser status');
   return 'Unified footer saves, combined clipboard save, draft indicators, search persistence and browser setup status passed';
  }finally{send=original;sleep.checked=before;window.receive({...data,action:'load'});window.showSection(section)}
 };
