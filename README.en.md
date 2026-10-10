@@ -53,6 +53,8 @@ No account required. Settings, clipboard contents and system information are pro
 
 Clipboard history is cleared on exit by default. Optional persistence uses a **local plaintext cache**; pause recording before copying sensitive content. Clearing history also clears the current system clipboard, with a confirmation prompt.
 
+Check for signed updates in About, then confirm to download, install and restart. Checking for updates uses the network.
+
 ## Learn more
 
 - [User guide](USAGE.en.md) · [Configuration import/export](CONFIGURATION.md) (Chinese)

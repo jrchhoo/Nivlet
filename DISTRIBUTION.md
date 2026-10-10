@@ -1,5 +1,18 @@
 # Nivlet for Mac 分发准备与验收
 
+## Build 18 更新通道
+
+使用固定 Sparkle 2.10.0 官方包（SHA-256 固定在 prepare-updater.sh），替换 Runtime 的 2.6.4。官网源为 docs/appcast.xml，更新包来自 GitHub Releases；私钥在 Keychain 账号 dev.local.DesktopToolkit.updates，严禁提交或输出私钥。公钥写入 Info.plist。新环境首次发布需自行安全配置该签名密钥；普通源码构建不需要私钥。
+
+发布顺序：增加 NIVLET_BUILD_NUMBER → 构建 → 打包 → generate-update-feed.py <ZIP> → tests/updates.py → 上传新附件 → 推送 appcast → 实测旧版更新与最新检查 → 保留回滚副本后移除过期下载附件。新 release tag 应按版本递增，禁止重写历史 tag。当前 v1.0.0 附件经用户授权更新为 Build 18，GitHub 自动生成的源码归档仍对应原 tag；更新实现源码见 main 的 b0ed084 及后续提交。
+
+```sh
+python3 scripts/generate-update-feed.py build/packages/Nivlet-1.0.0-build18-x86_64-arm64-local-release.zip
+python3 tests/updates.py
+```
+
+自动覆盖更新的 Ed25519 签名不能替代 Apple Developer ID/公证；当前 ad-hoc 更新后辅助功能权限仍可能失效。钥匙串私钥须由维护者另行安全备份，丢失后不能继续给现有公钥客户端签发更新。
+
 ## GitHub 1.0.0 发行基准（2026-10-10）
 
 用户决定暂不考虑 App Store，采用无需付费账号的 GitHub 正式发行路线。v1.0.0 使用应用 1.0.0 / Build 14，功能与已验收 Build 13 一致，包内补齐 81 份许可文件；rc.5 保留历史。本机 /Applications/Nivlet.app 继续保留 Build 13，不替换、不重签名，不修改个人配置。

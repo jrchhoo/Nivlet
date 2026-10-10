@@ -31,7 +31,7 @@ ET.SubElement(item, f'{{{ns}}}shortVersionString').text = version
 ET.SubElement(item, f'{{{ns}}}minimumSystemVersion').text = '13.0'
 ET.SubElement(item, 'description').text = '官网入口与签名自动更新。Website and signed in-app updates.'
 ET.SubElement(item, 'enclosure', {
-    'url': f'https://github.com/wivnelo/Nivlet/releases/download/v1.0.0/{archive.name}',
+    'url': f'https://github.com/wivnelo/Nivlet/releases/download/v{version}/{archive.name}',
     'length': str(archive.stat().st_size),
     'type': 'application/octet-stream',
     f'{{{ns}}}edSignature': signature,
