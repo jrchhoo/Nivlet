@@ -1,6 +1,6 @@
 # Nivlet User Guide
 
-[Back to README](../README.en.md) · [简体中文](USAGE.md)
+[Back to README](../README.md) · [简体中文](USAGE.md)
 
 ## Usage
 

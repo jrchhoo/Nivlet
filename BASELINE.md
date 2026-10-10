@@ -49,7 +49,7 @@
 
 [全部文档](documentation/README.md) · [历史归档](documentation/archive/README.md)
 
-- 产品介绍：[中文](README.md) / [English](README.en.md)
+- 产品介绍：[中文](README.zh-CN.md) / [English](README.md)
 - 操作：[使用指南](documentation/USAGE.md)、[安装指南](documentation/INSTALLATION.md)、[配置说明](documentation/CONFIGURATION.md)
 - 计划与当前版本：[开发计划](ROADMAP.md)、[正式发布说明](documentation/RELEASE-v1.0.0.md)
 - 工程：[开发构建](documentation/DEVELOPMENT.md)、[分发流程](documentation/DISTRIBUTION.md)、[验证记录](documentation/VALIDATION.md)、[许可核查](documentation/THIRD-PARTY-AUDIT.md)

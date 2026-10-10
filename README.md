@@ -1,68 +1,68 @@
 <p align="center">
-  <img src="assets/nivlet-icon.png" alt="Nivlet 应用图标" width="112">
+  <img src="assets/nivlet-icon.png" alt="Nivlet app icon" width="112">
 </p>
 
 <h1 align="center">Nivlet for Mac</h1>
 
 <p align="center">
-  <strong>让常用桌面操作更顺手。</strong><br>
-  剪贴板、窗口管理、应用快捷启动与浏览器分流，集中在 Mac 菜单栏。
+  <strong>Make everyday desktop tasks feel easier.</strong><br>
+  Clipboard history, window management, app shortcuts and browser routing in your Mac menu bar.
 </p>
 
 <p align="center">
-  <strong>简体中文</strong> · <a href="README.en.md">English</a>
+  <a href="README.zh-CN.md">简体中文</a> · <strong>English</strong>
 </p>
 
 <p align="center">
-  <a href="https://wivnelo.github.io/Nivlet/">官网</a> ·
-  <a href="https://github.com/wivnelo/Nivlet/releases/latest">下载安装</a> ·
-  <a href="USAGE.md">使用指南</a> ·
-  <a href="https://github.com/wivnelo/Nivlet/issues">问题反馈</a>
+  <a href="https://wivnelo.github.io/Nivlet/">Website</a> ·
+  <a href="https://github.com/wivnelo/Nivlet/releases/latest">Download</a> ·
+  <a href="documentation/USAGE.en.md">User guide</a> ·
+  <a href="https://github.com/wivnelo/Nivlet/issues">Report an issue</a>
 </p>
 
 ---
 
-Nivlet 是一款免费开源的 macOS 菜单栏工具，将常用操作放在一处。按需启用功能、配置自己的快捷键，无需编写代码，也无需另外安装 Hammerspoon。
+Nivlet is a free, open-source macOS menu bar utility that brings everyday desktop actions together. Enable the tools you need and choose your own shortcuts. No coding or separate Hammerspoon installation required.
 
-## 能做什么
+## What you can do
 
-| 功能 | 用法与亮点 |
+| Feature | Highlights |
 | --- | --- |
-| **剪贴板历史** | 留存文字与图片，支持搜索、缩略图、放大预览和 Option 直接粘贴；可暂停、排除应用与设置保留期限 |
-| **窗口管理** | 29 项操作，覆盖半屏、四角、三分区、九宫格、居中、缩放、跨屏与恢复 |
-| **应用快捷启动** | 自定义快捷键，启动应用或切到前台；支持更换应用、拖动排序与冲突检查 |
-| **浏览器分流** | 按域名或来源应用选择浏览器，让不同链接去往合适的目标 |
-| **输入法切换** | 为应用指定输入法，切换应用时自动切换 |
-| **系统信息** | 菜单栏查看网速，按需展示 CPU、内存、磁盘、网络地址和日期 |
-| **个性化与迁移** | 中英文、深浅色、标签排序，以及 JSON 配置导入导出 |
+| **Clipboard history** | Keep text and images with search, thumbnails, larger previews and Option-click paste; pause recording, exclude apps and choose retention limits |
+| **Window management** | 29 actions for halves, quarters, thirds, a 3×3 grid, centering, resizing, display moves and restore |
+| **App shortcuts** | Launch apps or bring them forward; replace apps, drag to reorder and check shortcut conflicts |
+| **Browser routing** | Choose the browser for a link based on its domain or source app |
+| **Input sources** | Assign an input source to an app and switch automatically when you activate it |
+| **System information** | See network speed in the menu bar and choose CPU, memory, disk, network addresses and dates to display |
+| **Personalization & migration** | Chinese and English, light and dark appearances, tab ordering and JSON configuration import/export |
 
-## 开始使用
+## Get started
 
-1. 从 [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/latest) 下载 **DMG 或 ZIP**，任选一个。
-2. 将 `Nivlet.app` 放入“应用程序”文件夹并打开。
-3. 点击菜单栏 **N 图标 → 设置…**，启用需要的功能并配置规则。
-4. 点击右下角 **保存设置**。切换页面会保留草稿，未保存的页面有橙点提示。
+1. Download **either the DMG or ZIP** from [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/latest).
+2. Move `Nivlet.app` to Applications and open it.
+3. Click the menu bar **N icon → Settings…**, enable your tools and configure their rules.
+4. Click **Save Settings** in the bottom-right corner. Switching tabs keeps drafts; an orange dot marks unsaved pages.
 
-功能按需开启，快捷键由你配置。窗口管理和 Option 直接粘贴需要**辅助功能权限**；浏览器分流需要将 **Nivlet 设为默认浏览器**。
+Features are opt-in, and shortcuts are yours to configure. Window management and Option-click paste require **Accessibility permission**. Browser routing requires choosing **Nivlet as your default browser**.
 
-> **安装提示：**当前版本尚未经过 Developer ID 签名与 Apple 公证，macOS 可能阻止首次打开。请查看 [安装、升级与卸载指南](documentation/INSTALLATION.md)。最低声明 macOS 13.0；安装包包含 Apple Silicon 与 Intel 架构，Intel、其他 macOS 和多屏兼容性尚未全面验证。
+> **Installation note:** This release has no Developer ID signature or Apple notarization; macOS may block first launch. See the [installation, upgrade and removal guide](documentation/INSTALLATION.md) (Chinese). Declared minimum: macOS 13.0. The package includes Apple Silicon and Intel architectures; Intel, other macOS versions and multiple displays have not been fully validated.
 
-关于页提供官网与“检查更新…”：发现新版后确认安装，自动下载、校验并重启。
+## Local processing, optional recording
 
-## 本地处理，按需记录
+No account required. Settings, clipboard contents and system information are processed locally without being uploaded to a server. Core desktop tools work offline; opening websites and external links uses the network.
 
-无需账号。配置、剪贴板与系统信息在本机处理，不上传服务器；核心桌面工具可离线使用。打开网页、外部链接与主动检查更新会联网。
+Clipboard history is cleared on exit by default. Optional persistence uses a **local plaintext cache**; pause recording before copying sensitive content. Clearing history also clears the current system clipboard, with a confirmation prompt.
 
-剪贴板历史默认退出后清空，可选择跨重启保留；持久历史使用**本地明文缓存**，复制敏感内容前可以暂停记录。清空历史会同时清空系统当前剪贴板，操作前会提示确认。
+Check for signed updates in About, then confirm to download, install and restart. Checking for updates uses the network.
 
-## 了解更多
+## Learn more
 
-- [使用指南](documentation/USAGE.md) · [配置导入导出](documentation/CONFIGURATION.md)
-- [版本记录](https://github.com/wivnelo/Nivlet/releases) · [开发计划](ROADMAP.md)
-- [开发与构建](documentation/DEVELOPMENT.md)
+- [User guide](documentation/USAGE.en.md) · [Configuration import/export](documentation/CONFIGURATION.md) (Chinese)
+- [Releases](https://github.com/wivnelo/Nivlet/releases) · [Roadmap](ROADMAP.md) (Chinese)
+- [Development & building](documentation/DEVELOPMENT.md) (Chinese)
 
-遇到问题或有建议，请提交 [GitHub Issue](https://github.com/wivnelo/Nivlet/issues)，附上应用版本、macOS 版本与复现步骤。请勿上传敏感剪贴板、私人配置或凭据。
+Report problems or suggestions through [GitHub Issues](https://github.com/wivnelo/Nivlet/issues). Include the app version, macOS version and reproduction steps. Do not upload sensitive clipboard contents, personal configurations or credentials.
 
-## 许可证与致谢
+## License & acknowledgements
 
-Nivlet 使用 [MIT License](LICENSE)。内置 Runtime 基于 [Hammerspoon](https://github.com/Hammerspoon/hammerspoon)；第三方组件保留各自许可证，见 [第三方声明](THIRD-PARTY-NOTICES.md)。
+Nivlet uses the [MIT License](LICENSE). Its embedded Runtime is based on [Hammerspoon](https://github.com/Hammerspoon/hammerspoon). Third-party components retain their own licenses; see [third-party notices](THIRD-PARTY-NOTICES.md).
