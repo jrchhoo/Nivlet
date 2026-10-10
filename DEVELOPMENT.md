@@ -1,5 +1,19 @@
 # 开发与构建
 
+## 当前工程基准（2026-10-10）
+
+正式版为 1.0.0 / Build 18，已安装并发布；当前状态以 [BASELINE.md](BASELINE.md) 为准。下面旧构建阶段的状态、命令及待办保留为历史参考。
+
+- Runtime 固定来源；构建通过 `scripts/prepare-updater.sh` 准备固定 Sparkle 2.10.0，许可收集包含其原文。
+- Release 构建使用完整 Xcode：`DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer NIVLET_BUILD_NUMBER=19 sh scripts/build-release.sh`。19 仅为下一构建示例，实际发布前核对并递增；构建不自动安装。
+- 更新入口位于关于页，原生 Sparkle 桥接由 `patches/nivlet-updater.patch` 注入；有草稿先处理，默认手动检查、用户确认安装。
+- Feed 为 `docs/appcast.xml`，使用 `scripts/generate-update-feed.py <ZIP>` 生成、`tests/updates.py` 验证。Ed25519 私钥留 Keychain，不导出到源码、日志或安装包。
+- 发布顺序：新版本/Build → 构建和回归 → 打包/签名校验 → 上传新附件 → 发布 feed → 实测升级及最新检查 → 保留回滚备份。
+- 当前 v1.0.0 附件更新为 Build 18；历史 tag 未重写，GitHub 自动源码归档仍对应原 tag。Build 18 更新实现源码见 main 的 `b0ed084` 及后续文档提交。下一功能版本使用新 tag，避免继续产生源码归档与附件版本差异。
+- 本机真实 16 → 18 更新已通过；完整更新异常、其他硬件/macOS及公证仍有待验项，见 [ROADMAP.md](ROADMAP.md)。GitHub 正式发布与 Apple 信任链分别描述。
+
+## 历史工程记录与参考清单
+
 ## GitHub 1.0.0 发行基准（2026-10-10）
 
 用户决定暂不考虑 App Store，采用无需付费账号的 GitHub 正式发行路线。v1.0.0 使用应用 1.0.0 / Build 14，功能与已验收 Build 13 一致，包内补齐 81 份许可文件；rc.5 保留历史。本机 /Applications/Nivlet.app 继续保留 Build 13，不替换、不重签名，不修改个人配置。

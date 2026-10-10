@@ -1,5 +1,7 @@
 # Nivlet for Mac 1.0.0 候选版说明
 
+> 当前状态（2026-10-10）：正式版 1.0.0 / Build 18，本机与 GitHub 发布附件一致。续开发以 [BASELINE.md](BASELINE.md) 和 [ROADMAP.md](ROADMAP.md) 为准。下文旧构建的“当前”、待办和未安装描述均为当时记录，不代表最新状态。
+
 ## 最新基准：1.0.0 / Build 18（2026-10-10）
 
 内置 GitHub 链接统一为 `wivnelo/Nivlet`。关于页官网入口已接入 https://wivnelo.github.io/Nivlet/ ，链接集中展示，更新独立成区。Sparkle 2.10.0 使用 Nivlet 独立 HTTPS appcast 与 Ed25519 更新包签名；私钥仅存本机钥匙串，不进入仓库。默认手动检查，确认后下载、校验、覆盖与重启；草稿未保存时阻止启动更新检查。

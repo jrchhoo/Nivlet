@@ -51,3 +51,9 @@ In Input Sources, add an app and choose one of the system's enabled input source
 - Launch at login takes effect after saving. Optional Command + L sleep is off by default; enabling it overrides the same shortcut in apps such as browsers.
 - Export JSON or a default example from General → Configuration Backup & Migration. Review the replacement scope before importing. Omitted modules stay unchanged; failures restore the previous configuration. History, caches, permissions, login items and the system default browser are excluded. See the [configuration guide](CONFIGURATION.md) (Chinese).
 
+
+## Saving changes and updating
+
+An orange dot marks tabs with unsaved changes. Save and Cancel apply only to the current page and are disabled on unchanged pages; switching tabs keeps drafts. Drag the handles to reorder app-launch and input-source rules, then save.
+
+Use About → Software update to check manually, then confirm download, installation and restart. Resolve unsaved changes first. Background checks and silent installation are off by default. Checking and downloading use the network; configuration and clipboard history are not uploaded. Development signatures may require Accessibility permission again. Older builds without the updater can be replaced using the latest GitHub download.

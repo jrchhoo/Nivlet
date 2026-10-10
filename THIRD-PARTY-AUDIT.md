@@ -1,5 +1,9 @@
 # 第三方许可工程核查
 
+> 当前状态（2026-10-10）：正式版 1.0.0 / Build 18，本机与 GitHub 发布附件一致。续开发以 [BASELINE.md](BASELINE.md) 和 [ROADMAP.md](ROADMAP.md) 为准。下文旧构建的“当前”、待办和未安装描述均为当时记录，不代表最新状态。
+
+Build 18 已纳入漏收许可及 Sparkle 2.10.0 原文，收集回归通过；旧表中的 Sparkle 2.6.4 仅描述 Build 13。完整特殊许可人工审查仍开放。
+
 > 2026-10-10 后续核查发现原脚本漏收 LICENSE.SimplePing、LICENSE.timeout3 和 LICENSE-examples。收集规则已修复并补回归，现收集 81 个许可文件；补充原文见 [THIRD-PARTY-SUPPLEMENT.md](THIRD-PARTY-SUPPLEMENT.md)。补充声明已作为 rc.5 独立附件发布，发布说明已同步更新；当前安装版及原 DMG/ZIP 仍为原声明，尚未重新打包；不能将此前“文件一致”解读为声明完整。
 
 
