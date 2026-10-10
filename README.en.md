@@ -21,7 +21,7 @@
 
 ## Current release
 
-Candidate: `v1.0.0-rc.5` / Build 13. Final Accessibility and Telegram-link revalidation is in progress; publication follows acceptance.
+Candidate: `v1.0.0-rc.5` / Build 13. Accessibility access was verified, and the user confirmed Telegram links open in Chrome without revealing Nivlet settings.
 
 **v1.0.0-rc.5 · App 1.0.0 / Build 13 · Pre-release**
 

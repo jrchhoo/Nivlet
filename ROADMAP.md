@@ -155,6 +155,6 @@ Build 10 Release 构建/签名通过，安装前无未保存草稿，正常退�
 
 浏览器页标题统一为“浏览器分流规则”；新增用户主动发起的“设为默认浏览器…”系统请求、重新检测及默认浏览器系统设置入口。未匹配浏览器的标签改为“未匹配时使用”。已接管时隐藏重复设置按钮。默认浏览器未自动修改；尚未实际重测从其他浏览器切换为 Nivlet 的系统确认框。
 
-Release Build 13 已备份 Build 12、本地数据与偏好后安装；备份为 Backups/build13-before-install.h0ex0n1k。实际页面标题、已接管状态、重新检测通过；系统设置备用入口实测落到“桌面与程序坞”，默认网页浏览器为 Nivlet。全部 Lua、原生 Dock、键盘录入及 12/12 WKWebView 回归通过，ZIP CRC、DMG、SHA-256 通过。最终辅助功能与 TG 链接人工复验待用户反馈，反馈通过前不公开发布。
+Release Build 13 已备份 Build 12、本地数据与偏好后安装；备份为 Backups/build13-before-install.h0ex0n1k。实际页面标题、已接管状态、重新检测通过；系统设置备用入口实测落到“桌面与程序坞”，默认网页浏览器为 Nivlet。全部 Lua、原生 Dock、键盘录入及 12/12 WKWebView 回归通过，ZIP CRC、DMG、SHA-256 通过。最终辅助功能已在安装版复核开启；用户确认 TG 链接由 Chrome 打开且 Nivlet 设置不闪现，本机候选验收通过。
 
 仍为 ad-hoc 预发布候选；Developer ID、公证、Gatekeeper 与跨机器验收未完成。登录项原注册失败根因与真实重新登录验证未关闭，不宣称全部缺陷已清零。个人 Hammerspoon 与私人配置未纳入发布包。
