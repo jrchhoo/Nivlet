@@ -14,6 +14,7 @@
 </p>
 
 <p align="center">
+  <a href="https://nivlet-for-mac.willhoo.chatgpt.site/">官网</a> ·
   <a href="https://github.com/jrchhoo/Nivlet/releases/latest">下载安装</a> ·
   <a href="USAGE.md">使用指南</a> ·
   <a href="https://github.com/jrchhoo/Nivlet/issues">问题反馈</a>

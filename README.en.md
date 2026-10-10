@@ -14,6 +14,7 @@
 </p>
 
 <p align="center">
+  <a href="https://nivlet-for-mac.willhoo.chatgpt.site/">Website</a> ·
   <a href="https://github.com/jrchhoo/Nivlet/releases/latest">Download</a> ·
   <a href="USAGE.en.md">User guide</a> ·
   <a href="https://github.com/jrchhoo/Nivlet/issues">Report an issue</a>
