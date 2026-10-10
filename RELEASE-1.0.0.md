@@ -50,7 +50,7 @@ GitHub 正式发行状态与 Apple 信任链独立：Build 14 仍为 ad-hoc，�
 
 ## 安装包和代码版本
 
-安装包见 [v1.0.0-rc.3 预发布](https://github.com/jrchhoo/Nivlet/releases/tag/v1.0.0-rc.3)，提供 DMG、ZIP 和 SHA-256 文件。仅提供 arm64 包，采用 ad-hoc 开发签名，未公证；下载后可能被 Gatekeeper 阻止。包声明最低 macOS 13.0，但其他 macOS 和其他机器尚未验收。
+安装包见 [v1.0.0-rc.3 预发布](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.0-rc.3)，提供 DMG、ZIP 和 SHA-256 文件。仅提供 arm64 包，采用 ad-hoc 开发签名，未公证；下载后可能被 Gatekeeper 阻止。包声明最低 macOS 13.0，但其他 macOS 和其他机器尚未验收。
 
 本机文件位于被 Git 忽略的 `build/packages/`。Git 不收录安装包；仅将上述三个发布文件上传至 Release。包中不含个人迁移配置或剪贴板缓存。旧 v1.0.0-rc.2 标签与发布说明保留。
 

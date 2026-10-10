@@ -254,7 +254,7 @@ function app.openSettings(section, focus)
             reply(ok,ok and i18n.t("启动设置已更新") or i18n.t("无法修改启动设置，请在系统设置中检查登录项"),body.action)
         end
         if body.action=="openProjectLink" then
-            local links={project="https://github.com/jrchhoo/Nivlet",issues="https://github.com/jrchhoo/Nivlet/issues",releases="https://github.com/jrchhoo/Nivlet/releases",license="https://github.com/jrchhoo/Nivlet/blob/main/LICENSE"}
+            local links={project="https://github.com/wivnelo/Nivlet",issues="https://github.com/wivnelo/Nivlet/issues",releases="https://github.com/wivnelo/Nivlet/releases",license="https://github.com/wivnelo/Nivlet/blob/main/LICENSE"}
             if links[body.link] then hs.urlevent.openURL(links[body.link]) end
         end
         if body.action=="setDefaultBrowser" then

@@ -17,7 +17,7 @@ GitHub 正式发行状态与 Apple 信任链独立：Build 14 仍为 ad-hoc，�
 需要完整 Xcode（完成许可确认与首次组件初始化）、Git、Python 3（含 PyYAML，上游文档构建脚本需要），以及命令行 Lua（仅用于检查和测试）。无需安装其他平台模拟器。上游依赖已随固定 checkout 提供，不在第一次构建时自动升级 CocoaPods。
 
 ```sh
-git clone https://github.com/jrchhoo/Nivlet.git Nivlet
+git clone https://github.com/wivnelo/Nivlet.git Nivlet
 cd Nivlet
 sh scripts/fetch-runtime.sh
 lua tests/preferences.lua

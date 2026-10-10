@@ -4,7 +4,7 @@
 
 ## 首次安装
 
-1. 从 [GitHub Release](https://github.com/jrchhoo/Nivlet/releases/tag/v1.0.0) 下载 DMG 或 ZIP，任选一种；不要运行多个副本。
+1. 从 [GitHub Release](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.0) 下载 DMG 或 ZIP，任选一种；不要运行多个副本。
 2. DMG 打开后将 Nivlet.app 拖入 Applications；ZIP 解压后将 App 放入 Applications。
 3. 从 Applications 打开，使用菜单栏 N 图标进入设置。无需另外安装 Hammerspoon。
 4. 先按需要配置并保存；窗口管理和 Option 直接粘贴需要辅助功能权限，其他模块不因此要求授权。

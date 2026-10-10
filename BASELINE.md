@@ -1,8 +1,12 @@
 # Nivlet 当前基准与续开发入口
 
+## GitHub 账号迁移（2026-10-10）
+
+账号已从 jrchhoo 改为 wivnelo，25 个仓库已确认保留。官网迁移至 https://wivnelo.github.io/Nivlet/ ，项目文档、页面及应用源码链接同步更新。本机已安装 App 和已有 Release 二进制不替换，其旧 GitHub 仓库链接依赖平台重定向，后续构建收录新链接。
+
 ## 官网迁移至 GitHub Pages（2026-10-10）
 
-公开官网入口改为 https://jrchhoo.github.io/Nivlet/ ，源码位于 docs/，由 main 分支发布；原 Sites 站点已关闭公开访问，源码保留。README 与仓库官网入口同步迁移。本轮不修改应用安装包或个人配置。
+公开官网入口改为 https://wivnelo.github.io/Nivlet/ ，源码位于 docs/，由 main 分支发布；原 Sites 站点已关闭公开访问，源码保留。README 与仓库官网入口同步迁移。本轮不修改应用安装包或个人配置。
 
 ## 正式版下载补充验收与官网首版（2026-10-10）
 
@@ -26,7 +30,7 @@ GitHub 正式发行状态与 Apple 信任链独立：Build 14 仍为 ad-hoc，�
 
 - 品牌 Nivlet，展示名称 Nivlet for Mac，安装名 Nivlet.app。
 - 已发布 **v1.0.0-rc.5 / 应用 1.0.0 / Build 13 / Release**，源码提交 `44267c634431f62ad7ef7d039796f38d1c3b5c9c`。
-- [GitHub 下载与发布说明](https://github.com/jrchhoo/Nivlet/releases/tag/v1.0.0-rc.5)：DMG、ZIP、SHA-256 已上传并核验。二进制含 arm64、x86_64；Intel 实机兼容性尚未确认。
+- [GitHub 下载与发布说明](https://github.com/wivnelo/Nivlet/releases/tag/v1.0.0-rc.5)：DMG、ZIP、SHA-256 已上传并核验。二进制含 arm64、x86_64；Intel 实机兼容性尚未确认。
 - 本机安装 `/Applications/Nivlet.app`，当前辅助功能已复核开启；用户确认最终版 TG→Chrome 正常且设置窗口不闪现。
 - 当前版本为 ad-hoc 签名预发布候选，未完成 Developer ID、公证、Gatekeeper 下载验收与跨机器测试，不称为正式稳定版。
 - 已确认的 23 项旧备份、旧包、构建缓存和隔离测试 App 已移入废纸篓，未清空；当前 App、Build 13 包、独立基准备份、个人配置及剪贴板历史保留。GitHub 历史版本保留。

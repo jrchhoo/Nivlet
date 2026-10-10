@@ -14,10 +14,10 @@
 </p>
 
 <p align="center">
-  <a href="https://jrchhoo.github.io/Nivlet/">官网</a> ·
-  <a href="https://github.com/jrchhoo/Nivlet/releases/latest">下载安装</a> ·
+  <a href="https://wivnelo.github.io/Nivlet/">官网</a> ·
+  <a href="https://github.com/wivnelo/Nivlet/releases/latest">下载安装</a> ·
   <a href="USAGE.md">使用指南</a> ·
-  <a href="https://github.com/jrchhoo/Nivlet/issues">问题反馈</a>
+  <a href="https://github.com/wivnelo/Nivlet/issues">问题反馈</a>
 </p>
 
 ---
@@ -38,7 +38,7 @@ Nivlet 是一款免费开源的 macOS 菜单栏工具，将常用操作放在一
 
 ## 开始使用
 
-1. 从 [GitHub Releases](https://github.com/jrchhoo/Nivlet/releases/latest) 下载 **DMG 或 ZIP**，任选一个。
+1. 从 [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/latest) 下载 **DMG 或 ZIP**，任选一个。
 2. 将 `Nivlet.app` 放入“应用程序”文件夹并打开。
 3. 点击菜单栏 **N 图标 → 设置…**，启用需要的功能并配置规则。
 4. 点击右下角 **保存设置**。切换页面会保留草稿，未保存的页面有橙点提示。
@@ -56,10 +56,10 @@ Nivlet 是一款免费开源的 macOS 菜单栏工具，将常用操作放在一
 ## 了解更多
 
 - [使用指南](USAGE.md) · [配置导入导出](CONFIGURATION.md)
-- [版本记录](https://github.com/jrchhoo/Nivlet/releases) · [开发计划](ROADMAP.md)
+- [版本记录](https://github.com/wivnelo/Nivlet/releases) · [开发计划](ROADMAP.md)
 - [开发与构建](DEVELOPMENT.md)
 
-遇到问题或有建议，请提交 [GitHub Issue](https://github.com/jrchhoo/Nivlet/issues)，附上应用版本、macOS 版本与复现步骤。请勿上传敏感剪贴板、私人配置或凭据。
+遇到问题或有建议，请提交 [GitHub Issue](https://github.com/wivnelo/Nivlet/issues)，附上应用版本、macOS 版本与复现步骤。请勿上传敏感剪贴板、私人配置或凭据。
 
 ## 许可证与致谢
 

@@ -14,10 +14,10 @@
 </p>
 
 <p align="center">
-  <a href="https://jrchhoo.github.io/Nivlet/">Website</a> ·
-  <a href="https://github.com/jrchhoo/Nivlet/releases/latest">Download</a> ·
+  <a href="https://wivnelo.github.io/Nivlet/">Website</a> ·
+  <a href="https://github.com/wivnelo/Nivlet/releases/latest">Download</a> ·
   <a href="USAGE.en.md">User guide</a> ·
-  <a href="https://github.com/jrchhoo/Nivlet/issues">Report an issue</a>
+  <a href="https://github.com/wivnelo/Nivlet/issues">Report an issue</a>
 </p>
 
 ---
@@ -38,7 +38,7 @@ Nivlet is a free, open-source macOS menu bar utility that brings everyday deskto
 
 ## Get started
 
-1. Download **either the DMG or ZIP** from [GitHub Releases](https://github.com/jrchhoo/Nivlet/releases/latest).
+1. Download **either the DMG or ZIP** from [GitHub Releases](https://github.com/wivnelo/Nivlet/releases/latest).
 2. Move `Nivlet.app` to Applications and open it.
 3. Click the menu bar **N icon → Settings…**, enable your tools and configure their rules.
 4. Click **Save Settings** in the bottom-right corner. Switching tabs keeps drafts; an orange dot marks unsaved pages.
@@ -56,10 +56,10 @@ Clipboard history is cleared on exit by default. Optional persistence uses a **l
 ## Learn more
 
 - [User guide](USAGE.en.md) · [Configuration import/export](CONFIGURATION.md) (Chinese)
-- [Releases](https://github.com/jrchhoo/Nivlet/releases) · [Roadmap](ROADMAP.md) (Chinese)
+- [Releases](https://github.com/wivnelo/Nivlet/releases) · [Roadmap](ROADMAP.md) (Chinese)
 - [Development & building](DEVELOPMENT.md) (Chinese)
 
-Report problems or suggestions through [GitHub Issues](https://github.com/jrchhoo/Nivlet/issues). Include the app version, macOS version and reproduction steps. Do not upload sensitive clipboard contents, personal configurations or credentials.
+Report problems or suggestions through [GitHub Issues](https://github.com/wivnelo/Nivlet/issues). Include the app version, macOS version and reproduction steps. Do not upload sensitive clipboard contents, personal configurations or credentials.
 
 ## License & acknowledgements
 
