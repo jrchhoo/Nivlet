@@ -126,6 +126,8 @@ Nivlet 是品牌名，Nivlet for Mac 是展示名称；安装的应用仍为 `Ni
 
 ## 文档与反馈
 
+[安装、升级与卸载指南](INSTALLATION.md)
+
 以下详细文档目前为中文：
 
 - [配置使用说明](CONFIGURATION.md)

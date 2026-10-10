@@ -1,5 +1,8 @@
 # Nivlet for Mac 分发准备与验收
 
+> 2026-10-10 后续核查发现原脚本漏收 LICENSE.SimplePing、LICENSE.timeout3 和 LICENSE-examples。收集规则已修复并补回归，现收集 81 个许可文件；补充原文见 [THIRD-PARTY-SUPPLEMENT.md](THIRD-PARTY-SUPPLEMENT.md)。当前安装版与 rc.5 附件仍为原声明，尚未重新打包；不能将此前“文件一致”解读为声明完整。
+
+
 
 ## 新用户补充验收（2026-10-10）
 
@@ -11,6 +14,10 @@
 
 
 本清单区分免费可完成的工程准备和需要 Apple Developer Program 的正式分发步骤。GitHub 测试包不等于已通过 Apple 公证的稳定版。
+
+## 免费准备当前结果
+
+已补齐 [安装、升级与卸载指南](INSTALLATION.md)；Build 13 的声明一致性、ZIP 路径筛查、101 个 Mach-O 架构及严格签名复核通过，详见 [许可工程核查](THIRD-PARTY-AUDIT.md)。首次下载/Gatekeeper、完整特殊许可条款、跨机器兼容性仍开放。无需重打包或替换当前应用。
 
 ## 无付费账号的本地构建
 

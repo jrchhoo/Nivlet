@@ -126,6 +126,8 @@ Opening web pages, GitHub or other external links uses the network. No update ch
 
 ## Documentation and feedback
 
+[Installation, upgrades and removal (Chinese)](INSTALLATION.md)
+
 These detailed documents are currently in Chinese:
 
 - [Configuration guide](CONFIGURATION.md)
