@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://jrchhoo.github.io/Nivlet/sitemap.xml
